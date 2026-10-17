@@ -171,3 +171,17 @@ test("dialog supports keyboard dismissal and restores focus", async ({
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(trigger).toBeFocused();
 });
+
+
+test("rejected and revised candidates persist without claiming final success", async ({ page, request }) => {
+  await request.post("http://127.0.0.1:8788/__test/reset", {data: {scenario: "revision"}});
+  await start(page);
+  const history = page.getByLabel("Repair attempt history");
+  await expect(history).toContainText("Candidate 1 · Rejected");
+  await expect(history).toContainText("Candidate 2 · Public checks passed");
+  await expect(history).toContainText("Normal purchases: 0/2");
+  await expect(history).toContainText("Normal purchases: 2/2");
+  await expect(page.locator(".metric-verdict")).not.toHaveText("Verified");
+  await page.reload();
+  await expect(history.locator(".repair-attempt")).toHaveCount(2);
+});

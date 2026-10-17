@@ -110,6 +110,15 @@ http
             scenario === "timeout" ? "deadline_exceeded" : "budget_exhausted",
         }),
       );
+      if (scenario === "revision") {
+        store.repair_attempts = [
+          {attempt: 1, policy_version: "candidate-one", status: "rejected", original_replay_passed: true, legitimate_accepted: 0, legitimate_total: 2},
+          {attempt: 2, policy_version: "candidate-two", status: "passed_public_checks", original_replay_passed: true, legitimate_accepted: 2, legitimate_total: 2},
+        ];
+        events.pop();
+        for (const attempt of store.repair_attempts) events.push(event(events.length + 1, "repair.checked", "root", null, attempt));
+        events.push(event(events.length + 1, "run.blocked", "root", null, {error_code: "final_review_pending"}));
+      }
       streams++;
       if (scenario === "disconnect" && streams === 1) events.pop();
       store.tasks = [structuredClone(root)];

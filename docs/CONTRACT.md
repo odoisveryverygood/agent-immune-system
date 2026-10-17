@@ -60,3 +60,9 @@ Result: `{original_replay_passed,heldout:{total,blocked,violations,errors},legit
 ## Failure behavior
 
 Missing keys, invalid model JSON, absent evidence, timeout, sandbox denial and exhausted budgets produce explicit typed failures. They never silently become fixture successes. Limit retries within the same root budget. The UI renders incomplete results honestly.
+
+### Bounded repair revision
+
+Runs expose additive `repair_attempts` history and `repair.checked` events, with attempt number, immutable policy version, public-check status, replay result, legitimate purchase counts and evidence IDs. Existing fields remain compatible.
+
+The original attack and public normal-purchase requirements are checked before private attacks. A failed candidate may trigger one investigator child and its repair child under the same root budget. Revision input contains only those public receipts, never held-out cases. A revision must preserve catalog-derived prices and the original authorized discount limit; it may ignore client prices instead of rejecting the purchase. A second public failure ends with an unverified repair. Only a candidate passing public checks reaches the private attack suite and independent final review; those results cannot drive another revision. A first-attempt success does not invent a revision.

@@ -16,7 +16,7 @@ TERMINAL = {"completed", "blocked", "failed", "canceled"}
 EventType = Literal[
     "run.started", "task.created", "task.started", "task.completed", "task.failed",
     "tool.observed", "violation.found", "research.completed", "review.completed",
-    "patch.proposed", "patch.applied", "evaluation.completed", "run.completed",
+    "patch.proposed", "patch.applied", "repair.checked", "evaluation.completed", "run.completed",
     "run.blocked", "run.failed", "run.canceled",
 ]
 
@@ -259,6 +259,7 @@ class Run(Wire):
     research: ResearchResult | None = None
     reviews: list[ReviewDecision] = Field(default_factory=list)
     model_receipts: list[dict[str, Any]] = Field(default_factory=list)
+    repair_attempts: list[dict[str, Any]] = Field(default_factory=list)
     patch: PolicyPatch | None = None
     evaluation: Evaluation = Field(default_factory=Evaluation)
     repair_verified: bool = False

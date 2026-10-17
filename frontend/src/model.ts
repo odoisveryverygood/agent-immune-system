@@ -30,6 +30,7 @@ export interface Run {
   evidence: Data[];
   patch?: Data;
   evaluation?: Data;
+  repair_attempts?: Data[];
   last_seq: number;
   runtime?: Data;
 }
@@ -190,6 +191,7 @@ export function applyEvent(run: Run, event: RunEvent): Run {
       ...d,
       applied: event.type === "patch.applied",
     };
+  if (event.type === "repair.checked") next.repair_attempts = [...(next.repair_attempts || []), d];
   if (event.type === "evaluation.completed") next.evaluation = d;
   if (/^run\.(completed|blocked|failed|canceled)$/.test(event.type))
     next.status = event.type.slice(4);

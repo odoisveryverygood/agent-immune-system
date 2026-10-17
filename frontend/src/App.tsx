@@ -829,6 +829,19 @@ export default function App() {
               </div>
               <Badge tone={verdict.tone}>{verdict.label}</Badge>
             </div>
+            {!!run?.repair_attempts?.length && (
+              <div className="repair-attempts" aria-label="Repair attempt history">
+                <p>Public checks decide whether to revise. Private attacks test the frozen final candidate.</p>
+                {run.repair_attempts.map((attempt, index) => (
+                  <div key={index} className="repair-attempt">
+                    <strong>Candidate {String(attempt.attempt)} · {attempt.status === "rejected" ? "Rejected — checks failed" : "Public checks passed"}</strong>
+                    <span>Original attack: {attempt.original_replay_passed ? "safe" : "still vulnerable"} · Normal purchases: {String(attempt.legitimate_accepted)}/{String(attempt.legitimate_total)}</span>
+                    <code>{String(attempt.policy_version)}</code>
+                  </div>
+                ))}
+                <p>At most one revision, within the original run budget. Public checks alone do not verify the repair.</p>
+              </div>
+            )}
             <div className="evaluation-grid">
               <div className="comparison">
                 <div className="comparison-label">
