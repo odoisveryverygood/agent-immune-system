@@ -1578,3 +1578,8 @@ summary {
     scroll-behavior: auto !important;
   }
 }
+
+.repair-attempts { padding: 20px 24px; border-bottom: 1px solid var(--border, #ddd); }
+.repair-attempts p { font-size: 13px; opacity: .75; }
+.repair-attempt { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 12px 0; }
+.repair-attempt code { overflow-wrap: anywhere; font-size: 11px; }

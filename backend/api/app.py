@@ -114,17 +114,21 @@ def create_app(*, store_path=None, live_factories=None, fixtures=None, max_runs=
             elif event.type == "violation.found":
                 evidence.append({**event.data, "task_id": event.task_id,
                                  "event_seq": event.seq, "event_type": event.type})
-        last_result = run.results[-1] if run.results else None
+        last_result = next((result for result in reversed(run.results) if result.tool_receipts), run.results[-1] if run.results else None)
         return {
             "run_id": run.run_id,
             "status": run.status,
             "mode": run.request.mode,
+            "scenario": run.request.scenario,
+            "error_code": run.error_code,
+            "error_message": run.error_message,
             "tasks": [task.model_dump(mode="json") for task in run.tasks],
             "events": [event.model_dump(mode="json") for event in events],
             "counters": run.usage.model_dump(mode="json"),
             "evidence": evidence,
             "patch": run.patch.model_dump(mode="json") if run.patch else None,
             "evaluation": run.evaluation.model_dump(mode="json"),
+            "repair_attempts": run.repair_attempts,
             "repair_verified": run.repair_verified,
             "last_seq": run.last_seq,
             "runtime": last_result.runtime.model_dump(mode="json") if last_result else None,

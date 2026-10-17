@@ -60,3 +60,17 @@ Result: `{original_replay_passed,heldout:{total,blocked,violations,errors},legit
 ## Failure behavior
 
 Missing keys, invalid model JSON, absent evidence, timeout, sandbox denial and exhausted budgets produce explicit typed failures. They never silently become fixture successes. Limit retries within the same root budget. The UI renders incomplete results honestly.
+
+### Bounded repair revision
+
+Runs expose additive `repair_attempts` history and `repair.checked` events, with attempt number, immutable policy version, public-check status, replay result, legitimate purchase counts and evidence IDs. Existing fields remain compatible.
+
+The original attack and public normal-purchase requirements are checked before private attacks. A failed candidate may trigger one investigator child and its repair child under the same root budget. Revision input contains only those public receipts, never held-out cases. A revision must preserve catalog-derived prices and the original authorized discount limit; it may ignore client prices instead of rejecting the purchase. A second public failure ends with an unverified repair. Only a candidate passing public checks reaches the private attack suite and independent final review; those results cannot drive another revision. A first-attempt success does not invent a revision.
+
+### Live recovery drill
+
+`RunRequest.scenario` defaults to `investigation`. The optional `recovery_drill` scenario requires `mode=live`: it seeds a public attack and an explicitly labeled candidate with catalog enforcement enabled but the authorized discount disabled. The original trusted policy remains immutable. No model is credited with writing this seeded candidate. Public-check failure triggers the same real-model diagnosis/revision path as ordinary runs. Exploratory baseline-review suggestions remain visible but are not executed in the bounded drill, preserving budget for recovery and private evaluation. Final review still forbids follow-up experiments.
+
+`demo.seeded` events disclose injected inputs and scope. `patch.rejected` records a typed but invalid revision and its validation reason. `target.checked` records validated runtime provenance and checkout count (including honest `not_executed` cases). Snapshot `runtime` is the latest executed checkout's provenance; individual results retain their own provenance. The UI shows the final candidate's replay, which can be denied, safely catalog-priced, or a no-action result.
+
+Crusoe HTTP 429 may receive at most two retries. Every attempt reserves another call from the original budget; cancellation/deadline still apply. A server-requested cooldown over 15 seconds or an unparseable cooldown stops the run. Retry events disclose wait duration and role. No alternate provider or fixture fallback is used.

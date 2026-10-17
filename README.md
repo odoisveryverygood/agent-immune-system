@@ -4,7 +4,7 @@
 
 Demo: a sandbox shopping agent is tricked into accepting a $500 laptop order for $0. An investigator follows the failure, delegates narrower attacks to child agents, reproduces the problem, proposes a constrained policy patch, and checks the original attack plus held-out cases.
 
-**Status: P1 backend implemented locally.** The fixture API and recursive workflow are available. The target sandbox, independent reviewer/researcher and frontend are still being built; live sponsor integrations are not yet verified end to end.
+**Status:** Integrated backend, target, reviewer and UI are available. A controlled live recovery drill has passed with Crusoe, Nemotron, You.com and OpenShell. The initial bad policy is deliberately seeded; the agents diagnose and revise it live. See [live demo instructions](docs/LIVE-RECOVERY-DEMO.md).
 
 ## Start here — four teammates
 

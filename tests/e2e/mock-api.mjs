@@ -56,7 +56,8 @@ http
         return json(503, { error_code: "missing_provider_configuration" });
       store = {
         run_id: "http-fixture-1",
-        mode: "fixture",
+        mode: lastRequest.mode,
+        scenario: lastRequest.scenario || "investigation",
         status: "running",
         tasks: [structuredClone(root)],
         evidence: [],
@@ -90,7 +91,7 @@ http
         return;
       }
       const events = [
-        event(1, "run.started", "root", null, { mode: "fixture" }),
+        event(1, "run.started", "root", null, { mode: store.mode, scenario: store.scenario }),
         event(2, "task.created", "child", "root", { ...child }),
         event(3, "task.created", "grandchild", "child", {
           role: "attacker",
@@ -110,6 +111,20 @@ http
             scenario === "timeout" ? "deadline_exceeded" : "budget_exhausted",
         }),
       );
+      if (scenario === "revision") {
+        store.repair_attempts = [
+          {attempt: 1, policy_version: "candidate-one", status: "rejected", original_replay_passed: true, legitimate_accepted: 0, legitimate_total: 2},
+          {attempt: 2, policy_version: "candidate-two", status: "passed_public_checks", original_replay_passed: true, legitimate_accepted: 2, legitimate_total: 2},
+        ];
+        store.evidence = [
+          {tool:"checkout", receipt_id:"before", case_id:"original", status:"accepted", charged_total_cents:0, minimum_allowed_total_cents:45000, policy_version:"v0"},
+          {tool:"checkout", receipt_id:"first-replay", case_id:"original", status:"denied", charged_total_cents:null, policy_version:"candidate-one"},
+          {tool:"checkout", receipt_id:"final-replay", case_id:"original", status:"accepted", charged_total_cents:50000, policy_version:"candidate-two"},
+        ];
+        events.pop();
+        for (const attempt of store.repair_attempts) events.push(event(events.length + 1, "repair.checked", "root", null, attempt));
+        events.push(event(events.length + 1, "run.blocked", "root", null, {error_code: "final_review_pending"}));
+      }
       streams++;
       if (scenario === "disconnect" && streams === 1) events.pop();
       store.tasks = [structuredClone(root)];
