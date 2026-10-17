@@ -1,0 +1,457 @@
+.ig-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-image: radial-gradient(#a6b2bd50 0.7px, transparent 0.7px);
+  background-size: 24px 24px;
+  isolation: isolate;
+}
+.ig-map-area {
+  position: absolute;
+  left: 20px;
+  right: 330px;
+  top: 100px;
+  bottom: 155px;
+  touch-action: none;
+  cursor: grab;
+  overflow: visible;
+}
+.ig-map-area:active {
+  cursor: grabbing;
+}
+.ig-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+.ig-orbit {
+  position: absolute;
+  border: 1px solid #9cabb51c;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.ig-orbit-one {
+  width: 420px;
+  height: 330px;
+}
+.ig-orbit-two {
+  width: 780px;
+  height: 570px;
+}
+.ig-connections {
+  position: absolute;
+  left: -1000px;
+  top: -700px;
+  overflow: visible;
+  pointer-events: none;
+}
+.ig-edge,
+.ig-target-link {
+  fill: none;
+  stroke: #b8c5d0;
+  stroke-width: 1.5;
+}
+.ig-target-link {
+  stroke-dasharray: 4 5;
+  stroke: #7896b5;
+}
+.ig-edge-active,
+.ig-edge-selected {
+  stroke: #3275db;
+  stroke-width: 2;
+}
+.ig-edge-active {
+  stroke-dasharray: 6 6;
+  animation: ig-flow 1.8s linear infinite;
+}
+.ig-target,
+.ig-task {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border: 1px solid #dce3e8;
+  background: #ffffffed;
+  color: #17212d;
+  text-align: left;
+  box-shadow:
+    0 6px 22px #1e334c08,
+    0 1px 3px #1e334c06;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  backdrop-filter: blur(14px);
+  font-family: inherit;
+}
+.ig-target:hover,
+.ig-task:hover {
+  border-color: #8aaadd;
+  box-shadow: 0 8px 25px #234a8212;
+}
+.ig-target:focus-visible,
+.ig-task:focus-visible,
+.ig-map-controls button:focus-visible {
+  outline: 3px solid #5998f5;
+  outline-offset: 4px;
+}
+.ig-target {
+  left: 0;
+  top: 0;
+  width: 220px;
+  padding: 23px 22px 0;
+  border-radius: 19px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  z-index: 3;
+  box-shadow:
+    0 12px 45px #243f6310,
+    0 0 0 6px #ffffff55;
+}
+.ig-target-icon {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dce7f8;
+  background: #f0f5fd;
+  border-radius: 13px;
+  color: #2466ca;
+  margin-bottom: 17px;
+}
+.ig-target-eyebrow {
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 1.55px;
+  color: #85909a;
+  margin-bottom: 8px;
+}
+.ig-target strong {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+}
+.ig-target-caption {
+  font-size: 10px;
+  color: #7c8792;
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.ig-target-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid #e9edf1;
+  width: calc(100% + 44px);
+  margin: 18px -22px 0;
+  padding: 12px 16px;
+  font-size: 10px;
+  color: #607284;
+}
+.ig-blue-dot {
+  display: inline-block;
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #377de2;
+}
+.ig-task {
+  width: 205px;
+  padding: 13px 14px 11px;
+  border-radius: 13px;
+  z-index: 4;
+  animation: ig-appear 0.35s ease-out both;
+}
+.ig-task-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.ig-task-icon {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  background: #f3f6fa;
+  border: 1px solid #e7edf3;
+  border-radius: 7px;
+  color: #586f89;
+}
+.ig-task-role {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: -0.05px;
+}
+.ig-status-dot {
+  width: 5px;
+  height: 5px;
+  background: #a9b4bf;
+  border-radius: 50%;
+  margin-left: auto;
+}
+.ig-status-running .ig-status-dot {
+  background: #347ae3;
+  box-shadow: 0 0 0 3px #347ae315;
+  animation: ig-pulse 1.5s infinite;
+}
+.ig-status-completed .ig-status-dot {
+  background: #5a9277;
+}
+.ig-status-failed .ig-status-dot,
+.ig-status-blocked .ig-status-dot {
+  background: #cc775f;
+}
+.ig-task-goal {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 11px;
+  color: #536170;
+  line-height: 1.55;
+  min-height: 34px;
+  margin: 10px 0;
+}
+.ig-task-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #99a2ac;
+  font-size: 8px;
+  letter-spacing: 0.3px;
+}
+.ig-task-meta > span:first-child {
+  text-transform: capitalize;
+}
+.ig-task-meta > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.ig-task.ig-selected,
+.ig-target.ig-selected {
+  border-color: #4a88e6;
+  box-shadow:
+    0 0 0 3px #4a88e614,
+    0 8px 24px #2047740d;
+}
+.ig-map-controls {
+  position: absolute;
+  bottom: 100px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffffd9;
+  border: 1px solid #dde4e9;
+  padding: 5px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 7px #23374d05;
+}
+.ig-map-controls button {
+  border: 0;
+  background: transparent;
+  color: #65788c;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  min-width: 0;
+}
+.ig-map-controls button:hover {
+  background: #eff4fa;
+  color: #2369ce;
+}
+.ig-map-controls button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.ig-map-controls > span:not(.ig-control-divider) {
+  font-size: 10px;
+  color: #76828e;
+  width: 32px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.ig-control-divider {
+  width: 1px;
+  height: 15px;
+  background: #e3e8ed;
+  margin: 0 3px;
+}
+.ig-map-legend {
+  position: absolute;
+  left: 28px;
+  bottom: 87px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  color: #7e8b97;
+  letter-spacing: 0.2px;
+}
+.ig-empty-caption {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 155px);
+  transform: translateX(-50%);
+  width: 280px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #8b98a4;
+  text-align: center;
+  pointer-events: none;
+}
+@keyframes ig-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes ig-pulse {
+  50% {
+    box-shadow: 0 0 0 5px #347ae308;
+  }
+}
+@keyframes ig-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (min-width: 1600px) {
+  .ig-map-area {
+    right: 370px;
+    left: 60px;
+  }
+}
+@media (max-width: 1000px) {
+  .ig-map-area {
+    right: 290px;
+    left: 0;
+  }
+  .ig-map-controls {
+    left: 18px;
+  }
+  .ig-map-legend {
+    left: 18px;
+  }
+}
+@media (max-width: 700px) {
+  .ig-map-area {
+    right: 0;
+    left: 0;
+    top: 230px;
+    bottom: 210px;
+  }
+  .ig-map-controls {
+    bottom: 190px;
+    left: 15px;
+  }
+  .ig-map-legend {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-task,
+  .ig-edge-active,
+  .ig-status-running .ig-status-dot {
+    animation: none;
+  }
+  .ig-target,
+  .ig-task {
+    transition: none;
+  }
+}
+
+.ig-task-role {
+  font-size: 13px;
+}
+.ig-task-goal {
+  font-size: 12px;
+}
+.ig-map-legend {
+  display: none;
+}
+.ig-compact .ig-task-goal {
+  display: none;
+}
+.ig-compact .ig-task {
+  width: 205px;
+  padding: 15px 12px;
+}
+.ig-compact .ig-task-top {
+  gap: 6px;
+  align-items: flex-start;
+}
+.ig-compact .ig-task-role {
+  font-size: 16px;
+  line-height: 1.25;
+}
+.ig-compact .ig-task-icon {
+  flex-shrink: 0;
+}
+.ig-compact .ig-status-dot {
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+.ig-compact .ig-task-meta {
+  font-size: 12px;
+  margin-top: 12px;
+  letter-spacing: 0;
+}
+.ig-compact .ig-target {
+  width: 175px;
+  padding: 18px 15px 0;
+}
+.ig-compact .ig-target strong {
+  font-size: 22px;
+  line-height: 1.1;
+}
+.ig-compact .ig-target-icon {
+  width: 35px;
+  height: 35px;
+  margin-bottom: 12px;
+}
+.ig-compact .ig-target-caption {
+  display: none;
+}
+.ig-compact .ig-target-foot {
+  width: calc(100% + 30px);
+  margin: 15px -15px 0;
+  font-size: 12px;
+}
+.ig-compact .ig-orbit-one {
+  width: 300px;
+  height: 300px;
+}
+.ig-compact .ig-orbit-two {
+  width: 630px;
+  height: 480px;
+}
+
+.ig-check-rejected {
+  border-color: #e8beb1;
+}
+.ig-check-rejected .ig-status-dot {
+  background: #c2664a;
+}
+.ig-check-rejected .ig-task-meta > span:first-child {
+  color: #a9563d;
+}
+.ig-check-passed .ig-task-meta > span:first-child {
+  color: #477c61;
+}
+.ig-compact .ig-task-meta {
+  flex-wrap: wrap;
+  gap: 6px;
+}
