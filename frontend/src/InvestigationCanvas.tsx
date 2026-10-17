@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { Run, Task } from "./model";
 import "./canvas-graph.css";
+import AgentRobot from "./AgentRobot";
 type Point = { x: number; y: number };
 export interface InvestigationCanvasProps {
   run: Run;
@@ -70,17 +71,16 @@ export default function InvestigationCanvas({
     });
     run.tasks
       .filter((t) => t.depth > 1)
-      .forEach((t, i) => {
-        const parent = p.get(t.parent_id || "") || { x: 320, y: 0 },
-          siblings = run.tasks.filter((s) => s.parent_id === t.parent_id),
-          offset =
-            (siblings.findIndex((s) => s.task_id === t.task_id) -
-              (siblings.length - 1) / 2) *
-            0.32,
-          a = Math.atan2(parent.y / 230, parent.x / 320) + offset;
+      .forEach((t) => {
+        const parent = p.get(t.parent_id || "") || { x: 320, y: 0 };
+        const siblings = run.tasks.filter((s) => s.parent_id === t.parent_id);
+        const siblingOffset =
+          (siblings.findIndex((s) => s.task_id === t.task_id) -
+            (siblings.length - 1) / 2) *
+          190;
         p.set(t.task_id, {
-          x: Math.cos(a) * (565 + Math.floor(i / 6) * 220),
-          y: Math.sin(a) * 355,
+          x: parent.x + (parent.x >= 0 ? 310 : -310),
+          y: parent.y + (parent.y >= 0 ? 90 : -90) + siblingOffset,
         });
       });
     return p;
@@ -171,8 +171,8 @@ export default function InvestigationCanvas({
             onClick={() => onSelect("target")}
             aria-pressed={selected === "target"}
           >
-            <span className="ig-target-icon">
-              <ShoppingBag size={25} strokeWidth={1.5} />
+            <span className="ig-target-robot">
+              <AgentRobot role="shopping" status={run.status} />
             </span>
             <span className="ig-target-eyebrow">SYSTEM UNDER TEST</span>
             <strong>Shopping agent</strong>
@@ -214,10 +214,14 @@ export default function InvestigationCanvas({
                 aria-label={`${roleName(t)}, ${t.status}: ${t.goal}`}
                 aria-pressed={selected === t.task_id}
               >
+                <span className="ig-task-robot">
+                  <AgentRobot
+                    role={t.role}
+                    status={t.status}
+                    rejected={checkStatus === "Checks failed"}
+                  />
+                </span>
                 <span className="ig-task-top">
-                  <span className="ig-task-icon">
-                    <Icon size={15} strokeWidth={1.7} />
-                  </span>
                   <span className="ig-task-role">{roleName(t)}</span>
                   <span className="ig-status-dot" title={t.status} />
                 </span>
