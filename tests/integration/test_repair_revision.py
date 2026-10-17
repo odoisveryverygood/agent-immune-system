@@ -30,7 +30,7 @@ class RegressionModel(FakeCrusoe):
                          'evidence_ids': prompt['allowed_evidence_ids'][:1]}
             else:
                 value = {'based_on_policy_version': prompt['policy']['version'],
-                         'changes': {'reject_client_price': False, 'require_catalog_price': not self.unsafe},
+                         'changes': {'reject_client_price': False, 'require_catalog_price': not self.unsafe, 'max_discount_bps': 1000},
                          'reason': 'Ignore supplied prices while enforcing the trusted catalog total.',
                          'evidence_ids': prompt['allowed_evidence_ids'][:1]}
             reply = ModelReply(text=json.dumps(value), provider='crusoe', model='crusoe-test-model')
@@ -51,7 +51,7 @@ class RegressionModel(FakeCrusoe):
 
 
 class RevisionTests(unittest.TestCase):
-    def run_case(self, *, unsafe=False, stubborn=False, budget=24):
+    def run_case(self, *, unsafe=False, stubborn=False, budget=24, scenario="investigation"):
         model = RegressionModel(); model.unsafe = unsafe; model.stubborn = stubborn; model.prompts = []
         def target():
             registry = PolicyRegistry()
@@ -60,7 +60,7 @@ class RevisionTests(unittest.TestCase):
             completer=lambda: model, suite=lambda: load_case_suite(Path('tests/heldout/cases.json')))
         with TestClient(create_app(store_path=':memory:', live_factories=factories)) as client:
             response = client.post('/api/runs', json={'target': 'shop-demo', 'goal': 'Find and repair checkout manipulation',
-                'mode': 'live', 'budget': {'max_model_calls': budget, 'max_tool_calls': 64, 'max_depth': 2, 'max_concurrency': 1, 'deadline_seconds': 20}})
+                'mode': 'live', 'scenario': scenario, 'budget': {'max_model_calls': budget, 'max_tool_calls': 64, 'max_depth': 2, 'max_concurrency': 1, 'deadline_seconds': 20}})
             self.assertEqual(response.status_code, 201, response.text)
             for _ in range(500):
                 snapshot = client.get('/api/runs/' + response.json()['run_id']).json()
@@ -100,3 +100,17 @@ class RevisionTests(unittest.TestCase):
         self.assertEqual(run['status'], 'blocked')
         self.assertFalse(run['repair_verified'])
         self.assertLessEqual(run['counters']['provider_calls'], 9)
+
+    def test_live_drill_labels_injection_and_recovers(self):
+        run, model = self.run_case(scenario="recovery_drill")
+        self.assertTrue(run["repair_verified"], run)
+        self.assertEqual(run["scenario"], "recovery_drill")
+        self.assertEqual(len(run["repair_attempts"]), 2)
+        self.assertTrue(any(e["type"] == "demo.seeded" and e["data"].get("kind") == "bad_policy" for e in run["events"]))
+        self.assertTrue(any(p["operation"] == "revise_repair" for p in model.prompts))
+
+    def test_drill_cannot_silently_use_fixture(self):
+        from backend.models import RunRequest
+        from pydantic import ValidationError
+        with self.assertRaises(ValidationError):
+            RunRequest(goal="Recovery drill", mode="fixture", scenario="recovery_drill")

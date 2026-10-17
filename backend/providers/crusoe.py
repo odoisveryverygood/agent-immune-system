@@ -1,6 +1,7 @@
 """Bounded host-side Crusoe transport. All dispatches go through RunContext."""
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import time
@@ -47,7 +48,19 @@ class CrusoeClient:
         model = self.reviewer_model if role == "reviewer" else self.model
         async def request():
             return await self._request(model, messages, max_tokens=4096 if role == "reviewer" else 1200)
-        return await run_context.dispatch_model(request, live=True, role=role)
+        for attempt in range(3):
+            try:
+                return await run_context.dispatch_model(request, live=True, role=role)
+            except IntegrationError as exc:
+                if exc.code != "rate_limited" or attempt == 2:
+                    raise
+                delay = getattr(exc, "retry_after", 5 * (attempt + 1))
+                if run_context.budget.remaining <= delay + 1:
+                    raise
+                run_context.emit("provider.retrying", {"provider": "crusoe", "role": role,
+                    "retry": attempt + 1, "wait_seconds": delay, "reason": "HTTP 429; retry consumes the original model budget."})
+                await asyncio.sleep(delay)
+                run_context.budget.guard()
 
     async def _request(self, model, messages, *, max_tokens=1200):
         payload = {"model": model, "messages": [m.model_dump() for m in messages],
@@ -61,7 +74,18 @@ class CrusoeClient:
                     headers={"Authorization": f"Bearer {self._key}", "Content-Type": "application/json"}) as response:
                 if response.status_code != 200:
                     code = {401: "authentication_failed", 403: "permission_denied", 429: "rate_limited"}.get(response.status_code, "provider_http_error")
-                    raise IntegrationError(code, f"Crusoe returned HTTP {response.status_code}; no fallback was used.")
+                    error = IntegrationError(code, f"Crusoe returned HTTP {response.status_code}; no fallback was used.")
+                    if code == "rate_limited":
+                        try:
+                            delay = float(response.headers.get("retry-after", "5"))
+                            if 0 <= delay <= 15:
+                                error.retry_after = max(1, delay)
+                            else:
+                                # Do not retry sooner than a long server-requested cooldown.
+                                error.code = "provider_cooldown"
+                        except ValueError:
+                            error.code = "provider_cooldown"
+                    raise error
                 raw = bytearray()
                 async for chunk in response.aiter_bytes():
                     raw.extend(chunk)

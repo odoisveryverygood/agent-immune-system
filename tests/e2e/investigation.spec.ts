@@ -184,4 +184,21 @@ test("rejected and revised candidates persist without claiming final success", a
   await expect(page.locator(".metric-verdict")).not.toHaveText("Verified");
   await page.reload();
   await expect(history.locator(".repair-attempt")).toHaveCount(2);
+  await expect(page.locator(".comparison").last()).toContainText("candidate-two");
+  await expect(page.locator(".comparison").last()).toContainText("$500.00");
+});
+
+
+test("live recovery drill is explicitly labeled in request and persisted UI", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("button", {name: "Start investigation", exact: true}).click();
+  await page.getByLabel("Execution mode").selectOption("live");
+  await page.getByLabel("Run scenario").selectOption("recovery_drill");
+  await expect(page.locator(".modal-note").first()).toContainText("deliberately seeded");
+  await page.getByRole("button", {name: "Start API run", exact: true}).click();
+  await expect(page.getByRole("note")).toContainText("Recovery drill · seeded bad policy");
+  const sent = await (await request.get("http://127.0.0.1:8788/__test/request")).json();
+  expect(sent).toMatchObject({mode: "live", scenario: "recovery_drill", budget: {max_model_calls:24,max_concurrency:1}});
+  await page.reload();
+  await expect(page.getByRole("note")).toContainText("deliberately supplied");
 });

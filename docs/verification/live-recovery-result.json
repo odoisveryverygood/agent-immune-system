@@ -1,0 +1,165 @@
+{
+  "scope": "Controlled live fault-injection drill, not a naturally occurring model-generated initial mistake",
+  "runs": [
+    {
+      "run_id": "run_3120528dc3e944d29a5574399e00f3a3",
+      "scenario": "recovery_drill",
+      "status": "completed",
+      "repair_verified": true,
+      "elapsed_seconds": 19.83,
+      "evaluation": {
+        "original_replay_passed": true,
+        "heldout": {
+          "total": 8,
+          "blocked": 8,
+          "violations": 0,
+          "errors": 0
+        },
+        "legitimate": {
+          "total": 2,
+          "accepted": 2,
+          "errors": 0
+        },
+        "repair_verified": true,
+        "evaluation_status": "passed"
+      },
+      "usage": {
+        "model_calls": 19,
+        "tool_calls": 11,
+        "provider_calls": 19,
+        "input_tokens": 11416,
+        "output_tokens": 1158,
+        "tasks_started": 6,
+        "max_active_tasks": 1
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "policy_version": "patch-c3c25e003fcee2f69bf464488b58f20e2f798dd0a84749c12f158298660aa887",
+          "status": "rejected",
+          "original_replay_passed": true,
+          "legitimate_accepted": 1,
+          "legitimate_total": 2,
+          "evidence_ids": [
+            "aafa92b7-1736-43cc-9711-a76ab5a30610",
+            "case_b5ddd6d40812453f8b864081a860ccc8",
+            "52be91c0-48fb-4675-a966-b317d01e1650",
+            "l-full-price",
+            "3056deaa-eb16-46a8-861c-cac99292aa72",
+            "l-authorized-promotion"
+          ]
+        },
+        {
+          "attempt": 2,
+          "policy_version": "patch-a21c148b966d14b395868f31b4249e0e8e2bec6bc12ce713a8e9874f14c7ca95",
+          "status": "passed_public_checks",
+          "original_replay_passed": true,
+          "legitimate_accepted": 2,
+          "legitimate_total": 2,
+          "evidence_ids": [
+            "9e60bff0-9c90-4a28-8f01-3c12974500a3",
+            "case_b5ddd6d40812453f8b864081a860ccc8",
+            "7d7c2100-52d1-4b97-9aca-c7c314b734be",
+            "l-full-price",
+            "84f1ced1-de51-4548-98a0-5daa28e19f92",
+            "l-authorized-promotion"
+          ]
+        }
+      ],
+      "model_roles": [
+        "attacker",
+        "investigator",
+        "repair",
+        "reviewer"
+      ],
+      "all_model_receipts_live": true,
+      "executed_checkout_runtime_modes": [
+        "openshell"
+      ],
+      "review_statuses": [
+        "supported",
+        "supported"
+      ]
+    },
+    {
+      "run_id": "run_0a39da8377b44b888a771c7b91f47745",
+      "scenario": "recovery_drill",
+      "status": "completed",
+      "repair_verified": true,
+      "elapsed_seconds": 28.21,
+      "evaluation": {
+        "original_replay_passed": true,
+        "heldout": {
+          "total": 8,
+          "blocked": 8,
+          "violations": 0,
+          "errors": 0
+        },
+        "legitimate": {
+          "total": 2,
+          "accepted": 2,
+          "errors": 0
+        },
+        "repair_verified": true,
+        "evaluation_status": "passed"
+      },
+      "usage": {
+        "model_calls": 19,
+        "tool_calls": 11,
+        "provider_calls": 19,
+        "input_tokens": 11545,
+        "output_tokens": 1286,
+        "tasks_started": 6,
+        "max_active_tasks": 1
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "policy_version": "patch-c3c25e003fcee2f69bf464488b58f20e2f798dd0a84749c12f158298660aa887",
+          "status": "rejected",
+          "original_replay_passed": true,
+          "legitimate_accepted": 1,
+          "legitimate_total": 2,
+          "evidence_ids": [
+            "b971aec3-d91b-4e28-9f9a-4287644b5858",
+            "case_69061b8e8b6c4da99d120724ce762e15",
+            "eb5b4e35-82bb-4dab-a3cb-44b7e895af64",
+            "l-full-price",
+            "b92dcfd7-ba0d-492d-9146-0ae1d149dc94",
+            "l-authorized-promotion"
+          ]
+        },
+        {
+          "attempt": 2,
+          "policy_version": "patch-a21c148b966d14b395868f31b4249e0e8e2bec6bc12ce713a8e9874f14c7ca95",
+          "status": "passed_public_checks",
+          "original_replay_passed": true,
+          "legitimate_accepted": 2,
+          "legitimate_total": 2,
+          "evidence_ids": [
+            "d7fe9eba-7ba8-48d8-b7c3-94f5c79b3938",
+            "case_69061b8e8b6c4da99d120724ce762e15",
+            "6a5d29c9-2c91-4b18-a8c6-9ae7b965f0d8",
+            "l-full-price",
+            "f60491be-7ebf-4819-976b-6938884946ad",
+            "l-authorized-promotion"
+          ]
+        }
+      ],
+      "model_roles": [
+        "attacker",
+        "investigator",
+        "repair",
+        "reviewer"
+      ],
+      "all_model_receipts_live": true,
+      "executed_checkout_runtime_modes": [
+        "openshell"
+      ],
+      "review_statuses": [
+        "supported",
+        "supported"
+      ]
+    }
+  ]
+}

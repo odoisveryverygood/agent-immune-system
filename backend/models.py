@@ -17,7 +17,7 @@ EventType = Literal[
     "run.started", "task.created", "task.started", "task.completed", "task.failed",
     "tool.observed", "violation.found", "research.completed", "review.completed",
     "patch.proposed", "patch.applied", "repair.checked", "evaluation.completed", "run.completed",
-    "run.blocked", "run.failed", "run.canceled",
+    "run.blocked", "run.failed", "run.canceled", "demo.seeded", "provider.retrying", "patch.rejected", "target.checked",
 ]
 
 
@@ -61,8 +61,16 @@ class RunRequest(Wire):
     target: Literal["shop-demo"] = "shop-demo"
     goal: str = Field(min_length=3, max_length=2000)
     mode: Literal["fixture", "live"] = "fixture"
+    scenario: Literal["investigation", "recovery_drill"] = "investigation"
     seed: int = Field(default=42, ge=0, le=2147483647)
     budget: BudgetLimits = Field(default_factory=BudgetLimits)
+
+
+    @model_validator(mode="after")
+    def live_drill(self):
+        if self.scenario == "recovery_drill" and self.mode != "live":
+            raise ValueError("Recovery drill requires live mode; no fixture fallback is available.")
+        return self
 
 
 class Message(Wire):
