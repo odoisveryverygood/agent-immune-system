@@ -3,7 +3,8 @@
 Implemented lane-local review, constrained repair, one-query research and final
 evaluation review. This is a library boundary ready for engine integration;
 the planning branch has no engine, target executor, API or UI to wire into yet.
-No live sponsor calls or OpenShell enforcement have been verified by this lane.
+One live You.com research query has been verified; live model calls and
+OpenShell enforcement remain unverified. See [VERIFICATION.md](VERIFICATION.md).
 
 ## Run locally
 
@@ -160,9 +161,12 @@ a wire-compatible inconclusive review; the engine should emit `review.completed`
 and block verification. Persist typed failures with the relevant task failure or
 run-blocked event rather than inventing a successful completion event.
 
-Local acceptance: tests use fixtures and mocked HTTP only. Live You.com,
+Local acceptance: 37 automated tests use fixtures and mocked HTTP only. A separate
+live smoke test on 2026-10-17 made one actual You.com request through `research()`
+and retained five sources without fixture fallback. The supplied key was used
+only in the test process, not saved to configuration files or Git. Live
 Crusoe/Nemotron responses, full engine/target integration and OpenShell remain
-unverified. The current shell did not have `YOU_API_KEY`, `CRUSOE_API_KEY` or
-`NEMOTRON_MODEL` configured; no credential values were inspected or recorded.
+unverified. Persistent host credential configuration is still required for app
+runs; this isolated test does not provision it.
 The implementation branch starts from planning PR #1; merge that planning PR
 before this implementation PR after human review. No direct main push or merge.
