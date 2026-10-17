@@ -1,0 +1,12 @@
+{
+  "status": "supported",
+  "reason": "Exact original replay is denied; held-out summary has three blocked cases; full-price and 10% discount purchases were accepted.",
+  "evidence_ids": [
+    "receipt-baseline",
+    "receipt-replay",
+    "receipt-full",
+    "receipt-discount"
+  ],
+  "uncertainty": [],
+  "proposed_child_goals": []
+}

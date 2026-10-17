@@ -1,0 +1,6 @@
+{
+  "version": "policy-v1",
+  "reject_client_price": false,
+  "require_catalog_price": false,
+  "max_discount_bps": 1000
+}
