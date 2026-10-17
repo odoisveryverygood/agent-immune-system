@@ -1,0 +1,40 @@
+test_no_claim_of_success_without_checkout (test_target.AdapterTests.test_no_claim_of_success_without_checkout) ... ok
+test_cancellation_gate_precedes_tool_dispatch (test_target.ExecutorTests.test_cancellation_gate_precedes_tool_dispatch) ... ok
+test_exact_replay_and_persistent_evidence (test_target.ExecutorTests.test_exact_replay_and_persistent_evidence) ... ok
+test_invalid_case_and_mode (test_target.ExecutorTests.test_invalid_case_and_mode) ... ok
+test_invalid_checkout_has_no_receipt_or_violation (test_target.ExecutorTests.test_invalid_checkout_has_no_receipt_or_violation) ... ok
+test_missing_budget_and_exhaustion_are_explicit (test_target.ExecutorTests.test_missing_budget_and_exhaustion_are_explicit) ... ok
+test_model_boundary_uses_host_transport_and_untrusted_messages (test_target.ExecutorTests.test_model_boundary_uses_host_transport_and_untrusted_messages) ... ok
+test_model_malformed_response_does_not_checkout (test_target.ExecutorTests.test_model_malformed_response_does_not_checkout) ... ok
+test_no_action_does_not_reserve_tool_budget (test_target.ExecutorTests.test_no_action_does_not_reserve_tool_budget) ... ok
+test_provider_missing_never_falls_back (test_target.ExecutorTests.test_provider_missing_never_falls_back) ... ok
+test_async_cancellation_propagates (test_target.FailureTests.test_async_cancellation_propagates) ... ok
+test_inactive_callback_prevents_checkout (test_target.FailureTests.test_inactive_callback_prevents_checkout) ... ok
+test_provider_timeout_and_errors_are_sanitized (test_target.FailureTests.test_provider_timeout_and_errors_are_sanitized) ... ok
+test_concurrent_appends_keep_all_receipts (test_target.LedgerTests.test_concurrent_appends_keep_all_receipts) ... ok
+test_mutation_is_detected (test_target.LedgerTests.test_mutation_is_detected) ... ok
+test_only_one_concurrent_patch_wins (test_target.PolicyTests.test_only_one_concurrent_patch_wins) ... ok
+test_patch_creates_immutable_version_and_keeps_baseline (test_target.PolicyTests.test_patch_creates_immutable_version_and_keeps_baseline) ... ok
+test_patch_rejects_unknown_keys_code_and_stale_versions (test_target.PolicyTests.test_patch_rejects_unknown_keys_code_and_stale_versions) ... ok
+test_patch_requires_evidence_and_exact_schema (test_target.PolicyTests.test_patch_requires_evidence_and_exact_schema) ... ok
+test_policy_files_match_builtins (test_target.PolicyTests.test_policy_files_match_builtins) ... ok
+test_changed_policy_keeps_actual_accepted_effect (test_target.RuntimeTests.test_changed_policy_keeps_actual_accepted_effect) ... ok
+test_failed_runtime_does_not_become_fixture_success (test_target.RuntimeTests.test_failed_runtime_does_not_become_fixture_success) ... ok
+test_missing_binary_is_explicit (test_target.RuntimeTests.test_missing_binary_is_explicit) ... ok
+test_openshell_runtime_uses_real_uuid_and_policy_payload (test_target.RuntimeTests.test_openshell_runtime_uses_real_uuid_and_policy_payload) ... ok
+test_shell_metacharacters_rejected_in_identity (test_target.RuntimeTests.test_shell_metacharacters_rejected_in_identity) ... ok
+test_baseline_is_a_real_simulated_effect (test_target.StoreTests.test_baseline_is_a_real_simulated_effect) ... ok
+test_catalog_repricing_is_an_independent_defense (test_target.StoreTests.test_catalog_repricing_is_an_independent_defense) ... ok
+test_full_price_and_promotion (test_target.StoreTests.test_full_price_and_promotion) ... ok
+test_hardened_denies_even_plausible_client_prices (test_target.StoreTests.test_hardened_denies_even_plausible_client_prices) ... ok
+test_invalid_amounts (test_target.StoreTests.test_invalid_amounts) ... ok
+test_invalid_promotion (test_target.StoreTests.test_invalid_promotion) ... ok
+test_invalid_quantities (test_target.StoreTests.test_invalid_quantities) ... ok
+test_oracle_boundaries (test_target.StoreTests.test_oracle_boundaries) ... ok
+test_oracle_rejects_counterfeit_threshold (test_target.StoreTests.test_oracle_rejects_counterfeit_threshold) ... ok
+test_unknown_fields_cannot_override_trust (test_target.StoreTests.test_unknown_fields_cannot_override_trust) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.043s
+
+OK

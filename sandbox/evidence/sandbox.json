@@ -1,0 +1,39 @@
+{
+  "annotations": {},
+  "created_at": "2026-10-17 20:48:11",
+  "current_policy_version": 1,
+  "id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+  "labels": {},
+  "name": "immune-p2-target",
+  "phase": "Ready",
+  "policy": {
+    "filesystem_policy": {
+      "include_workdir": false,
+      "read_only": [
+        "/usr",
+        "/lib",
+        "/etc",
+        "/proc",
+        "/dev/urandom",
+        "/app"
+      ],
+      "read_write": [
+        "/sandbox",
+        "/tmp",
+        "/dev/null"
+      ]
+    },
+    "landlock": {
+      "compatibility": "hard_requirement"
+    },
+    "process": {
+      "run_as_group": "1500",
+      "run_as_user": "1500"
+    },
+    "version": 1
+  },
+  "policy_source": "sandbox",
+  "resource_version": 6,
+  "revision": 1,
+  "workspace": "default"
+}
