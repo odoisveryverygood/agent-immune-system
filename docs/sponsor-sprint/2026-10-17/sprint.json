@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "project": "Agent Immune System",
+  "as_of": "2026-10-17",
+  "scope": "P1 Crusoe model transport and the recursive engine boundary; no end-to-end live run.",
+  "integrations": [
+    {
+      "integration_id": "CRUSOE-001",
+      "sponsor": "Crusoe Managed Inference",
+      "purpose": "Supply bounded model completions for the investigation workflow and an explicitly distinct Nemotron reviewer model.",
+      "docs_url": "https://docs.cloud.crusoe.ai/quickstart/getting-started-with-serverless-inference/index.html",
+      "docs_checked_at": "2026-10-17",
+      "implementation_ref": "backend/providers/crusoe.py; backend/engine/context.py; backend/engine/runner.py",
+      "env_vars": ["CRUSOE_API_KEY", "CRUSOE_MODEL", "NEMOTRON_MODEL"],
+      "checks": [
+        {
+          "check_id": "CRUSOE-C001",
+          "required": true,
+          "mode": "live",
+          "status": "passed",
+          "expected": "A live model completion returns validated JSON and a sanitized provider/model receipt through the root-budgeted completion interface.",
+          "observed": "Crusoe model catalog returned HTTP 200; one completion through RunContext returned the expected JSON and a sanitized live receipt with root counters model_calls=1 and provider_calls=1. This is a provider-boundary check, not an end-to-end run.",
+          "checked_at": "2026-10-17T20:59:32Z",
+          "evidence_path": "crusoe-live-check.txt",
+          "evidence_sha256": "166a35c802d7067aab6f3951c1f4799dc50b89bd2003470f7adfbe4ab146f3b8"
+        },
+        {
+          "check_id": "CRUSOE-C002",
+          "required": false,
+          "mode": "local",
+          "status": "passed",
+          "expected": "Backend Python source compiles and the working diff has no whitespace errors.",
+          "observed": "python3 -m compileall -q backend and git diff --check exited 0.",
+          "checked_at": "2026-10-17T20:53:56Z",
+          "evidence_path": "compile-check.txt",
+          "evidence_sha256": "43733c85bf65339c75112d36cc1807229c8f717a0e6ece0ed8d327e90804ba12"
+        },
+        {
+          "check_id": "CRUSOE-C003",
+          "required": true,
+          "mode": "live",
+          "status": "not_run",
+          "expected": "A reviewer-role completion uses the configured distinct Nemotron model through the shared budgeted interface.",
+          "observed": "The authenticated catalog listed a distinct Nemotron model, but no reviewer-role completion was sent. The full reviewer flow remains pending Person 3's integration."
+        }
+      ]
+    }
+  ]
+}

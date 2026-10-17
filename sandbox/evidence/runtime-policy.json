@@ -1,0 +1,36 @@
+{
+  "active_version": 1,
+  "config_revision": 16389037918534949279,
+  "hash": "f70075670287c74b3afb6bac964fe2b06f05091325155663356da9903e43131f",
+  "policy": {
+    "filesystem_policy": {
+      "include_workdir": false,
+      "read_only": [
+        "/usr",
+        "/lib",
+        "/etc",
+        "/proc",
+        "/dev/urandom",
+        "/app"
+      ],
+      "read_write": [
+        "/sandbox",
+        "/tmp",
+        "/dev/null"
+      ]
+    },
+    "landlock": {
+      "compatibility": "hard_requirement"
+    },
+    "process": {
+      "run_as_group": "1500",
+      "run_as_user": "1500"
+    },
+    "version": 1
+  },
+  "policy_source": "sandbox",
+  "sandbox": "immune-p2-target",
+  "scope": "sandbox",
+  "status": "effective",
+  "version": 1
+}

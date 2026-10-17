@@ -1,0 +1,12 @@
+{
+  "patch_id": "patch-fixture-1",
+  "based_on_policy_version": "policy-v1",
+  "changes": {
+    "reject_client_price": true,
+    "require_catalog_price": true
+  },
+  "reason": "Reject client-supplied prices and use the trusted catalog for the failure in receipt-baseline.",
+  "evidence_ids": [
+    "receipt-baseline"
+  ]
+}

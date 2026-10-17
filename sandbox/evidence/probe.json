@@ -1,0 +1,1 @@
+{"allowed_workspace_write": true, "filesystem_errno": 13, "forbidden_file_read": "denied", "forbidden_network": "inconclusive", "network_error": "Tunnel connection failed: 403 Forbidden", "network_error_type": "OSError"}

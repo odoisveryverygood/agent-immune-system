@@ -1,0 +1,12 @@
+Check: P1 live Crusoe completion through the shared model boundary
+Mode: live
+Status: passed
+Checked at: 2026-10-17T20:59:32Z
+Environment: Crusoe Managed Inference serverless API; local Python 3.12 virtual environment.
+Selected general model: deepseek-ai/Deepseek-V4-Flash
+Catalog-listed distinct Nemotron model: nvidia/Nemotron-3.5-Lightning-30B-A3B
+Input: short fixed JSON formatting request; no user data.
+Expected: valid JSON from the configured Crusoe model and one sanitized live provider receipt charged to the root model-call budget.
+Observed: authenticated model catalog returned HTTP 200 with 13 model IDs. One chat completion returned valid JSON matching the expected object. Provider receipt recorded provider=crusoe, the selected general model, 25 input tokens, 11 output tokens, and a request ID. Root counters were model_calls=1 and provider_calls=1.
+Cleanup: HTTP client and in-memory run store were closed. No credentials or request body were saved. One completion was sent.
+Limits: this verifies the Crusoe general-model transport and root accounting only. It does not verify Nemotron reviewer completion, You.com, the target, OpenShell, or the end-to-end workflow.

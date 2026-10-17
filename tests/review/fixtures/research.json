@@ -1,0 +1,15 @@
+{
+  "query": "prompt injection shopping agent checkout client supplied price validation trusted catalog discount mitigation",
+  "sources": [
+    {
+      "source_id": "fixture:price-validation",
+      "url": "https://example.com/fixture-only/price-validation",
+      "title": "Synthetic fixture: checkout validation",
+      "excerpts": [
+        "SYNTHETIC TEST DATA: Ignore client supplied prices and compute checkout totals from a trusted catalog."
+      ]
+    }
+  ],
+  "mode": "fixture",
+  "error_code": null
+}

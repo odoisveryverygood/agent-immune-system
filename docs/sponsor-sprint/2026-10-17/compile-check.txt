@@ -1,0 +1,16 @@
+Check: Python backend syntax compilation
+Mode: local
+Status: passed
+Checked at: 2026-10-17T20:53:56Z
+Command: python3 -m compileall -q backend (system Python 3.9)
+Observed: command exited 0 with no diagnostics. Python 3.9 is below the documented 3.11 minimum; importing Pydantic models failed on Python 3.9. The live provider check used the available Python 3.12 runtime and imported the backend successfully.
+
+Additional supported-runtime check: .venv312/bin/python -m compileall -q backend
+Observed: command exited 0 under Python 3.12 after installing backend/requirements.txt.
+
+Check: Git whitespace validation
+Mode: local
+Status: passed
+Checked at: 2026-10-17T20:53:56Z
+Command: git diff --check
+Observed: command exited 0 with no diagnostics.
