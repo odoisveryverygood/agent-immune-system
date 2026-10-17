@@ -115,6 +115,12 @@ Malformed model responses/citations raise LaneError. Missing or contradictory
         output.update(status="inconclusive", proposed_child_goals=[],
                       reason="Unresolved uncertainty: " + "; ".join(decision.uncertainty))
         output["reason"] = output["reason"][:4000]
+    elif decision.status == "unsupported":
+        # The model cannot erase a proven numeric violation. Its disagreement
+        # means independent review is unresolved, not that the receipt is safe.
+        output.update(status="inconclusive", proposed_child_goals=[],
+                      reason=("Deterministic violation remains proven; independent review is unresolved: "
+                              + decision.reason)[:4000])
     elif decision.status != "supported":
         output["proposed_child_goals"] = []
     return ReviewOutput.model_validate(output).model_dump()

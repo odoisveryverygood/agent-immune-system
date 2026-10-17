@@ -134,6 +134,18 @@ class LaneTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["proposed_child_goals"], [])
         self.assertIn("provenance", result["reason"])
 
+    async def test_model_disagreement_cannot_erase_proven_numeric_violation(self):
+        decision = fixture("review")
+        decision.update(status="unsupported", reason="The enforcement switches permit client prices.",
+                        proposed_child_goals=[])
+        engine = EngineFixture([decision])
+        result = await review(self.baseline, self.policy, self.research, engine.context())
+        self.assertEqual(result["status"], "inconclusive")
+        self.assertIn("Deterministic violation remains proven", result["reason"])
+        self.assertEqual(result["proposed_child_goals"], [])
+        prompt = engine.calls[0][1][0]["content"]
+        self.assertIn("they NEVER authorize a charge below", prompt)
+
     async def test_invalid_json_and_duplicate_keys_block_verification(self):
         for text in ("not JSON", "```json\n{}\n```", "{}", "[]", '{"status":"supported","status":"unsupported"}',
                      '{"score":NaN}', "[" * 2000, "a" * 32001):
