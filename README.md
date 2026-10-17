@@ -4,7 +4,7 @@
 
 Demo: a sandbox shopping agent is tricked into accepting a $500 laptop order for $0. An investigator follows the failure, delegates narrower attacks to child agents, reproduces the problem, proposes a constrained policy patch, and checks the original attack plus held-out cases.
 
-**Status: planning scaffold. The application and sponsor integrations are not implemented or verified yet.**
+**Status: P1 backend implemented locally.** The fixture API and recursive workflow are available. The target sandbox, independent reviewer/researcher and frontend are still being built; live sponsor integrations are not yet verified end to end.
 
 ## Start here — four teammates
 
@@ -57,6 +57,26 @@ Until the planning PR is reviewed and merged, clone its branch as shown above so
 - **You.com:** retrieve relevant documented attack/mitigation guidance. Store source URLs and excerpts; treat retrieved text as untrusted evidence.
 
 See [INTEGRATIONS.md](docs/INTEGRATIONS.md) for owners, configuration and verification requirements.
+
+## Run the backend
+
+```sh
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements.txt
+sh scripts/setup.sh
+uvicorn backend.api.app:app --reload
+```
+
+The fixture mode runs locally and does not need API keys. Try a complete deterministic workflow:
+
+```sh
+curl -sS http://127.0.0.1:8000/api/runs \
+  -H 'Content-Type: application/json' \
+  -d '{"target":"shop-demo","goal":"Find and repair a checkout price manipulation","mode":"fixture","seed":42}'
+```
+
+Use the returned `run_id` with `GET /api/runs/{run_id}` for the persisted task tree and results, or `GET /api/runs/{run_id}/events` for the resumable SSE event stream. `GET /api/capabilities` reports whether live prerequisites are configured; it does not claim those integrations have been verified. The backend stores run history in `.state/runs.sqlite3` by default. See [API details](docs/API.md) before connecting another lane.
 
 ## Tight scope
 
