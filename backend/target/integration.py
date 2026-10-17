@@ -57,3 +57,11 @@ def create_target():
     registry = PolicyRegistry()
     runtime = OpenShellRuntime(sandbox_id, gateway=gateway)
     return EngineTarget(TargetExecutor(registry=registry, runtime=runtime), registry)
+
+
+def create_cart_target():
+    """Same repair/runtime contract, separate cart-planner implementation."""
+    from .cart_agent import CartPlannerAgent
+    target = create_target()
+    target.executor.decision_agent = CartPlannerAgent()
+    return target

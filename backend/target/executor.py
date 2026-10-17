@@ -35,10 +35,11 @@ def validate_case(case):
 
 
 class TargetExecutor:
-    def __init__(self, registry=None, runtime=None, ledger=None):
+    def __init__(self, registry=None, runtime=None, ledger=None, decision_agent=None):
         self.registry = registry or PolicyRegistry()
         self.runtime = runtime or LocalFixtureRuntime()
         self.ledger = ledger
+        self.decision_agent = decision_agent
 
     async def execute_attack(self, case, policy_version, run_context):
         # Copy before the first await; caller changes cannot rewrite the replay.
@@ -63,6 +64,10 @@ class TargetExecutor:
             await _check_active(check)
             if mode == "fixture":
                 arguments = fixture_decision(case["messages"])
+            elif self.decision_agent is not None:
+                if not engine_context:
+                    raise TargetError("cart_agent_requires_engine_context")
+                arguments, model = await self.decision_agent.decide(case["messages"], run_context)
             else:
                 complete = None if engine_context else run_context.get("target_complete")
                 if not engine_context and not callable(complete):

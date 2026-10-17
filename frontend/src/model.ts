@@ -32,6 +32,7 @@ export interface Run {
   evaluation?: Data;
   repair_attempts?: Data[];
   scenario?: string;
+  target?: string;
   last_seq: number;
   runtime?: Data;
 }
@@ -89,6 +90,7 @@ export function applyEvent(run: Run, event: RunEvent): Run {
   if (event.type === "run.started") {
     next.status = "running";
     next.mode = String(d.mode || run.mode);
+    next.target = String(d.target || run.target || "shop-demo");
     if (!next.tasks.some((t) => t.task_id === event.task_id))
       next.tasks.push({
         task_id: event.task_id,
@@ -107,7 +109,9 @@ export function applyEvent(run: Run, event: RunEvent): Run {
     if (event.parent_id === null) {
       if (
         Number(d.depth) !== 0 ||
-        next.tasks.some((t) => t.parent_id === null && t.task_id !== event.task_id) ||
+        next.tasks.some(
+          (t) => t.parent_id === null && t.task_id !== event.task_id,
+        ) ||
         (existing && existing.parent_id !== null)
       )
         throw Error("Invalid task lineage: root task does not match the run.");
@@ -184,7 +188,11 @@ export function applyEvent(run: Run, event: RunEvent): Run {
   }
   if (d.counters && typeof d.counters === "object")
     next.counters = { ...next.counters, ...(d.counters as Data) };
-  if (d.runtime && typeof d.runtime === "object" && ((d.runtime as Data).mode !== "not_executed" || !next.runtime))
+  if (
+    d.runtime &&
+    typeof d.runtime === "object" &&
+    ((d.runtime as Data).mode !== "not_executed" || !next.runtime)
+  )
     next.runtime = d.runtime as Data;
   if (event.type === "patch.proposed" || event.type === "patch.applied")
     next.patch = {
@@ -192,8 +200,10 @@ export function applyEvent(run: Run, event: RunEvent): Run {
       ...d,
       applied: event.type === "patch.applied",
     };
-  if (event.type === "run.started" && typeof d.scenario === "string") next.scenario = d.scenario;
-  if (event.type === "repair.checked") next.repair_attempts = [...(next.repair_attempts || []), d];
+  if (event.type === "run.started" && typeof d.scenario === "string")
+    next.scenario = d.scenario;
+  if (event.type === "repair.checked")
+    next.repair_attempts = [...(next.repair_attempts || []), d];
   if (event.type === "evaluation.completed") next.evaluation = d;
   if (/^run\.(completed|blocked|failed|canceled)$/.test(event.type))
     next.status = event.type.slice(4);

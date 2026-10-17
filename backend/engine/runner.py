@@ -58,7 +58,7 @@ class RecursiveRunner:
         try:
             self.run.status = "running"
             self.emit("run.started", {"mode": self.run.request.mode, "label": "fixture" if self.run.request.mode == "fixture" else "live models / simulated store",
-                                      "scenario": self.run.request.scenario, "budget": self.run.request.budget.model_dump(), "seed": self.run.request.seed})
+                                      "target": self.run.request.target, "scenario": self.run.request.scenario, "budget": self.run.request.budget.model_dump(), "seed": self.run.request.seed})
             async with asyncio.timeout(self.run.request.budget.deadline_seconds):
                 await self.execute_task(self.root, finalize=False)
                 policy = self.run.policies[0]

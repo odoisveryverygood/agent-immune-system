@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from backend.models import Run, RunRequest, TERMINAL, fingerprint
 from .errors import EngineError, IntegrationError
@@ -54,6 +54,9 @@ class RunService:
                 factories, blockers = (self.live_factories, []) if self.live_factories else discover_live()
                 if blockers:
                     raise IntegrationError("live_prerequisites_missing", "; ".join(blockers))
+            if run.request.target == "cart-planner":
+                from backend.target.integration import create_cart_target
+                factories = replace(factories, target=create_cart_target)
             job.runner = RecursiveRunner(run, self.store, factories)
             await job.runner.run_workflow()
         except asyncio.CancelledError:

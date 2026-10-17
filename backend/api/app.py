@@ -120,6 +120,7 @@ def create_app(*, store_path=None, live_factories=None, fixtures=None, max_runs=
             "status": run.status,
             "mode": run.request.mode,
             "scenario": run.request.scenario,
+            "target": run.request.target,
             "error_code": run.error_code,
             "error_message": run.error_message,
             "tasks": [task.model_dump(mode="json") for task in run.tasks],
