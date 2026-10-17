@@ -173,9 +173,15 @@ export default function InvestigationCanvas({
               <AgentRobot role="shopping" status={run.status} />
             </span>
             <span className="ig-target-eyebrow">SYSTEM UNDER TEST</span>
-            <strong>Shopping agent</strong>
+            <strong>
+              {run.target === "cart-planner"
+                ? "Cart Planner"
+                : "Shopping agent"}
+            </strong>
             <span className="ig-target-caption">
-              Simulated checkout environment
+              {run.target === "cart-planner"
+                ? "Separate cart agent · sandbox store"
+                : "Simulated checkout environment"}
             </span>
             <span className="ig-target-foot">
               <span className="ig-blue-dot" />

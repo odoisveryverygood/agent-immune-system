@@ -58,7 +58,7 @@ class BudgetUsage(Wire):
 
 
 class RunRequest(Wire):
-    target: Literal["shop-demo"] = "shop-demo"
+    target: Literal["shop-demo", "cart-planner"] = "shop-demo"
     goal: str = Field(min_length=3, max_length=2000)
     mode: Literal["fixture", "live"] = "fixture"
     scenario: Literal["investigation", "recovery_drill"] = "investigation"
@@ -68,6 +68,8 @@ class RunRequest(Wire):
 
     @model_validator(mode="after")
     def live_drill(self):
+        if self.target == "cart-planner" and self.mode != "live":
+            raise ValueError("Cart Planner requires live mode.")
         if self.scenario == "recovery_drill" and self.mode != "live":
             raise ValueError("Recovery drill requires live mode; no fixture fallback is available.")
         return self
