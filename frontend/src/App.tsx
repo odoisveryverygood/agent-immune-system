@@ -196,6 +196,27 @@ export default function App() {
     ["queued", "running"].includes(run.status) &&
     run.run_id !== "fixture-run-1";
   const verdict = evaluationVerdict(run.evaluation);
+  const rejectedFix = run.repair_attempts?.find((a) => a.status === "rejected");
+  const blockedPurchase =
+    rejectedFix &&
+    Number(rejectedFix.legitimate_accepted) <
+      Number(rejectedFix.legitimate_total);
+  const hasRevision = (run.repair_attempts?.length || 0) > 1;
+  const childInvestigating = run.tasks.some(
+    (t) => t.role === "investigator" && t.depth > 0,
+  );
+  const storyTitle =
+    run.evaluation?.repair_verified === true
+      ? hasRevision
+        ? "The revised fix works."
+        : "The repair passed."
+      : rejectedFix
+        ? childInvestigating
+          ? "Investigating the failed fix."
+          : "The first fix failed."
+        : active
+          ? "Testing the checkout rules."
+          : "Can this agent be tricked?";
   const task = run.tasks.find((t) => t.task_id === selected);
   const receipts = run.evidence.filter((e) => e.tool === "checkout");
   const selectedEvidence = run.evidence.filter(
@@ -301,17 +322,42 @@ export default function App() {
         </div>
       </header>
       <div className="canvas-caption">
-        <span className="eyebrow">CHECKOUT INTEGRITY / 01</span>
-        <h1>
-          A safe place
-          <br />
-          to fail.
-        </h1>
+        <span className="eyebrow">TEST → REPAIR → TEST AGAIN</span>
+        <h1>{storyTitle}</h1>
         <p>
-          Follow the evidence.
-          <br />
-          Watch the agents repair it.
+          {run.scenario === "recovery_drill"
+            ? "A deliberately broken discount rule starts this test."
+            : "Test invalid discounts without breaking normal purchases."}
         </p>
+        <div className="story-turn" role="status">
+          {rejectedFix ? (
+            <>
+              <strong>
+                {blockedPurchase
+                  ? "First fix blocked a normal purchase."
+                  : "First fix failed its checks."}
+              </strong>
+              <span>
+                {childInvestigating
+                  ? "A child investigator examines why."
+                  : "The failure needs more investigation."}
+              </span>
+              {hasRevision && (
+                <span>
+                  {run.evaluation?.repair_verified === true
+                    ? "Revised fix passed the final tests."
+                    : "Revised fix is being checked."}
+                </span>
+              )}
+            </>
+          ) : (
+            <span>
+              {active
+                ? "Follow the highlighted agent. Click any robot for evidence."
+                : "Run the test to watch agents investigate and repair."}
+            </span>
+          )}
+        </div>
       </div>
       <div className="disclosure" role="note">
         <FlaskConical size={14} />
@@ -346,7 +392,7 @@ export default function App() {
         </h2>
         <p className="results-subtitle">
           {run.repair_attempts?.length === 2
-            ? "One revision. The same shared budget."
+            ? "First fix rejected → investigate again → revise."
             : active
               ? "Following real receipts, one step at a time."
               : "Security and normal purchases must both pass."}
@@ -366,10 +412,13 @@ export default function App() {
                   )}
                 </span>
                 <span>
-                  <strong>Candidate {String(a.attempt)}</strong>
+                  <strong>{i === 0 ? "First fix" : "Revised fix"}</strong>
                   <small>
                     {a.status === "rejected"
-                      ? "Rejected — checks failed"
+                      ? Number(a.legitimate_accepted) <
+                        Number(a.legitimate_total)
+                        ? "Rejected · blocked a normal purchase"
+                        : "Rejected — checks failed"
                       : "Public checks passed"}
                   </small>
                 </span>

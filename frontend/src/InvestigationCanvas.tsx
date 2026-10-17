@@ -134,8 +134,6 @@ export default function InvestigationCanvas({
             transform: `translate(${size.width / 2 + pan.x}px,${size.height / 2 + pan.y}px) scale(${scale})`,
           }}
         >
-          <div className="ig-orbit ig-orbit-one" />
-          <div className="ig-orbit ig-orbit-two" />
           <svg
             className="ig-connections"
             width="2000"
@@ -198,12 +196,25 @@ export default function InvestigationCanvas({
                 : attempt?.status === "passed_public_checks"
                   ? "Public checks passed"
                   : undefined;
-            const Icon =
-              t.role === "repair"
-                ? Wrench
-                : t.role === "reviewer"
-                  ? ShieldCheck
-                  : ScanSearch;
+            const finding =
+              t.status === "failed"
+                ? "Task could not finish"
+                : attempt?.status === "rejected"
+                  ? Number(attempt.legitimate_accepted) <
+                    Number(attempt.legitimate_total)
+                    ? "Blocked a normal purchase"
+                    : "First fix failed checks"
+                  : attempt?.status === "passed_public_checks"
+                    ? "Revised rules passed checks"
+                    : t.role === "repair"
+                      ? "Repairing checkout rules"
+                      : t.role === "reviewer"
+                        ? t.status === "completed"
+                          ? "Evidence reviewed"
+                          : "Checking the evidence"
+                        : t.depth > 0
+                          ? "Why did the fix fail?"
+                          : "Can discounts be abused?";
             return (
               <button
                 type="button"
@@ -222,17 +233,13 @@ export default function InvestigationCanvas({
                   />
                 </span>
                 <span className="ig-task-top">
-                  <span className="ig-task-role">{roleName(t)}</span>
+                  <span className="ig-task-role">{finding}</span>
                   <span className="ig-status-dot" title={t.status} />
                 </span>
-                <span className="ig-task-goal">{t.goal}</span>
+                <span className="ig-task-goal">{roleName(t)}</span>
                 <span className="ig-task-meta">
                   <span title={`Task ${t.status}`}>
                     {checkStatus || t.status}
-                  </span>
-                  <span>
-                    <GitBranch size={11} />
-                    Depth {t.depth}
                   </span>
                 </span>
               </button>

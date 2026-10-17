@@ -441,3 +441,105 @@ details {
     top: 260px;
   }
 }
+
+/* Make the recursive repair story readable before opening evidence. */
+.canvas-caption {
+  max-width: 255px;
+}
+.canvas-caption h1 {
+  font-size: 29px;
+  letter-spacing: -0.9px;
+  margin: 12px 0;
+}
+.canvas-caption p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.story-turn {
+  border-left: 2px solid #efab64;
+  padding-left: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #bbd7f4;
+}
+.story-turn strong,
+.story-turn span {
+  display: block;
+  margin: 5px 0;
+}
+.story-turn strong {
+  color: #f4f1e9;
+  font-weight: 500;
+}
+.ig-canvas {
+  background-image: none;
+}
+.ig-task,
+.ig-task.ig-check-rejected {
+  background: #1c293b80;
+  box-shadow: none;
+  border-color: transparent;
+}
+.ig-task-goal {
+  display: block;
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: normal;
+}
+.ig-compact .ig-task-goal {
+  display: block;
+}
+.ig-task-meta {
+  font-size: 10px;
+}
+.ig-edge {
+  stroke-opacity: 0.25;
+}
+.ig-edge-active,
+.ig-edge-selected {
+  stroke-opacity: 1;
+  stroke-width: 2.5px;
+}
+.ig-status-running {
+  border-color: #efab6480;
+  background: #293648;
+}
+@media (max-width: 700px) {
+  .canvas-caption {
+    max-width: calc(100% - 245px);
+  }
+  .canvas-caption h1 {
+    font-size: 22px;
+  }
+  .story-turn {
+    font-size: 10px;
+    margin-top: 8px;
+    padding-left: 8px;
+  }
+  .canvas-caption p {
+    display: none;
+  }
+  .ig-compact .ig-task-role {
+    font-size: 14px;
+  }
+  .ig-compact .ig-task-goal {
+    font-size: 11px;
+  }
+}
+@media (max-width: 440px) {
+  .canvas-caption {
+    max-width: calc(100% - 225px);
+    left: 16px;
+  }
+  .canvas-caption h1 {
+    font-size: 18px;
+  }
+  .story-turn {
+    font-size: 9px;
+  }
+}
+.ig-task-meta {display:none;}
+.ig-task,.ig-task.ig-check-rejected {background:transparent;backdrop-filter:none;}
+.ig-task.ig-selected,.ig-task:hover {background:#25354aef;}
+.ig-task-goal {margin-bottom:0;}
