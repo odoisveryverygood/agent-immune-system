@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00.000 --> 00:08.000
+Agent Immune System: investigate an agent, trace a failure, verify a repair.
+Fixture walkthrough only. No models or sandbox execution.
+
+00:08.000 --> 00:18.000
+Follow root → child → grandchild using persisted task IDs.
+Select each task to inspect its parent and reason for spawning.
+
+00:18.000 --> 00:29.000
+The illustrative receipt accepts a $0 laptop order.
+The trusted minimum is $450. Accepted tool effects are the evidence.
+
+00:29.000 --> 00:39.000
+The constrained patch changes only approved policy fields.
+Policy versions and evidence references stay visible.
+
+00:39.000 --> 00:49.000
+The original case has an illustrative denied replay.
+Repair remains incomplete: held-out, legitimate and review checks have not run.
+
+00:49.000 --> 01:00.000
+Start investigation sends a real API request when the backend is available.
+Shared caps, explicit failures and snapshot recovery preserve accountability.
