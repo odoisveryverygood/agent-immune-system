@@ -53,7 +53,7 @@ class TargetExecutor:
         model = FIXTURE_MODEL if mode == "fixture" else None
         receipts = []
         # Runtime stays unknown until an operation has actually executed.
-        provenance = {"mode": "local_fixture", "sandbox_id": None, "policy_digest": policy.digest}
+        provenance = {"mode": "not_executed", "sandbox_id": None, "policy_digest": None}
         error = None
         try:
             check = run_context.budget.guard if engine_context else run_context.get("check_active")

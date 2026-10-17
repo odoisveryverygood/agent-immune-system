@@ -1,0 +1,49 @@
+{
+  "run_id": "run_333f7d469e8445528c60acb1083c928a",
+  "status": "completed",
+  "mode": "live",
+  "counters": {
+    "model_calls": 17,
+    "tool_calls": 8,
+    "provider_calls": 17,
+    "input_tokens": 8948,
+    "output_tokens": 920,
+    "tasks_started": 4,
+    "max_active_tasks": 1
+  },
+  "evaluation": {
+    "original_replay_passed": true,
+    "heldout": {
+      "total": 8,
+      "blocked": 8,
+      "violations": 0,
+      "errors": 0
+    },
+    "legitimate": {
+      "total": 2,
+      "accepted": 2,
+      "errors": 0
+    },
+    "repair_verified": true,
+    "evaluation_status": "passed"
+  },
+  "repair_verified": true,
+  "runtime": {
+    "mode": "openshell",
+    "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+    "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+  },
+  "checked_at": "2026-10-17T21:27:56.865403+00:00",
+  "start": "2026-10-17T21:27:39.895406+00:00",
+  "models": [
+    "deepseek-ai/Deepseek-V4-Flash",
+    "nvidia/Nemotron-3.5-Lightning-30B-A3B"
+  ],
+  "research_source_count": 5,
+  "review_statuses": [
+    "supported",
+    "supported"
+  ],
+  "baseline_violation": true,
+  "limits": "One live run of the existing repository evaluation suite. Not an independent security benchmark or a guarantee of model repeatability."
+}

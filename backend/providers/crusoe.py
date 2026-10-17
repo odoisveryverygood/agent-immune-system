@@ -46,15 +46,18 @@ class CrusoeClient:
             raise IntegrationError("model_input_too_large", "Model messages exceed the bounded input limit.")
         model = self.reviewer_model if role == "reviewer" else self.model
         async def request():
-            return await self._request(model, messages)
+            return await self._request(model, messages, max_tokens=4096 if role == "reviewer" else 1200)
         return await run_context.dispatch_model(request, live=True, role=role)
 
-    async def _request(self, model, messages):
+    async def _request(self, model, messages, *, max_tokens=1200):
         payload = {"model": model, "messages": [m.model_dump() for m in messages],
-                   "temperature": 0, "max_tokens": 1200}
+                   "temperature": 0, "max_tokens": max_tokens}
+        if model == self.reviewer_model:
+            # Reserve the output budget for the bounded JSON verdict, not hidden reasoning.
+            payload["chat_template_kwargs"] = {"enable_thinking": False}
         start = time.monotonic()
         try:
-            async with self._http.stream("POST", ENDPOINT, json=payload,
+            async with self._http.stream("POST", ENDPOINT, json=payload, timeout=60 if model == self.reviewer_model else 30,
                     headers={"Authorization": f"Bearer {self._key}", "Content-Type": "application/json"}) as response:
                 if response.status_code != 200:
                     code = {401: "authentication_failed", 403: "permission_denied", 429: "rate_limited"}.get(response.status_code, "provider_http_error")

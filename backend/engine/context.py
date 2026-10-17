@@ -60,7 +60,7 @@ class RunContext:
                 if live:
                     self.run.usage.provider_calls += 1
                     self.store.save(self.run)
-                reply = await self.bounded(operation())
+                reply = await self.bounded(operation(), seconds=60 if role == "reviewer" else 30)
         self.budget.guard()
         self.run.usage.input_tokens += reply.input_tokens
         self.run.usage.output_tokens += reply.output_tokens

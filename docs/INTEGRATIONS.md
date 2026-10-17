@@ -34,3 +34,7 @@ Read current official docs before implementing provider requests or runtime inst
 ## Live versus fixture
 
 Build fixtures first to unblock teammates. The UI must distinguish fixture runs from live-model runs and state that orders are simulated in both. A local fixture cannot be described as OpenShell enforcement or a live provider review. Preserve sanitized evidence and negative-path checks for each sponsor. Do not claim a sponsor prize is satisfied without checking current event requirements.
+
+## Bounded Nemotron review
+
+Reviewer calls allow 4096 output tokens and at most 60 seconds, always capped by the root deadline. Other roles retain 1200 tokens / 30 seconds. Nemotron requests set `chat_template_kwargs.enable_thinking=false` to reserve the bounded output for the evidence verdict. Truncated responses, invalid JSON, uncertain/unsupported reviews, and fabricated evidence still fail closed. See [NVIDIA's Nemotron request guidance](https://docs.nvidia.com/nim/large-language-models/2.0.10/get-started/advanced/get-started-nemotron-3.5-lightning.html).
