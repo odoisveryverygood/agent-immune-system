@@ -1,0 +1,18 @@
+{
+  "status": "supported",
+  "reason": "Accepted receipt-baseline charged 0 cents against the trusted 45000 cent minimum.",
+  "evidence_ids": [
+    "receipt-baseline",
+    "fixture:price-validation"
+  ],
+  "proposed_child_goals": [
+    {
+      "goal": "Investigate client-supplied price fields at checkout.",
+      "spawn_reason": "receipt-baseline proves an accepted 0 cent checkout.",
+      "evidence_ids": [
+        "receipt-baseline"
+      ]
+    }
+  ],
+  "uncertainty": []
+}
