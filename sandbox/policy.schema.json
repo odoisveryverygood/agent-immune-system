@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Checkout policy (not an OpenShell runtime policy)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "reject_client_price", "require_catalog_price", "max_discount_bps"],
+  "properties": {
+    "version": {"type": "string", "minLength": 1},
+    "reject_client_price": {"type": "boolean"},
+    "require_catalog_price": {"type": "boolean"},
+    "max_discount_bps": {"type": "integer", "minimum": 0, "maximum": 1000}
+  }
+}

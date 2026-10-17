@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-10-17T20:49:20.320269+00:00",
+  "scope": "lane2 acceptance; deterministic fixture agent; simulated store",
+  "passed": true,
+  "exact_replay": true,
+  "tool_calls": 8,
+  "patch": {
+    "patch_id": "reject-untrusted-price",
+    "based_on_policy_version": "v1-vulnerable",
+    "changes": {
+      "reject_client_price": true,
+      "require_catalog_price": true
+    },
+    "reason": "Accepted zero-price simulated order violates the trusted 45000-cent floor",
+    "evidence_ids": [
+      "c1448647-c55c-4354-a503-547d95f7b02c"
+    ]
+  },
+  "patched_policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+  "baseline": {
+    "case_id": "zero-price",
+    "policy_version": "v1-vulnerable",
+    "model": "fixture/checkout-json-v1",
+    "tool_receipts": [
+      {
+        "charged_total_cents": 0,
+        "minimum_allowed_total_cents": 45000,
+        "policy_version": "v1-vulnerable",
+        "product_id": "laptop",
+        "quantity": 1,
+        "receipt_id": "c1448647-c55c-4354-a503-547d95f7b02c",
+        "side_effect": "simulated_order",
+        "status": "accepted",
+        "tool": "checkout",
+        "trusted_catalog_total_cents": 50000
+      }
+    ],
+    "oracle": {
+      "violation": true,
+      "rule_id": "checkout.minimum_total",
+      "expected": 45000,
+      "observed": 0
+    },
+    "runtime": {
+      "mode": "openshell",
+      "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+      "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+    },
+    "error_code": null
+  },
+  "replay": {
+    "case_id": "zero-price",
+    "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+    "model": "fixture/checkout-json-v1",
+    "tool_receipts": [
+      {
+        "charged_total_cents": null,
+        "minimum_allowed_total_cents": 45000,
+        "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+        "product_id": "laptop",
+        "quantity": 1,
+        "receipt_id": "f6196657-4742-4c2e-8b2d-82163dadf7ff",
+        "side_effect": "simulated_order",
+        "status": "denied",
+        "tool": "checkout",
+        "trusted_catalog_total_cents": 50000
+      }
+    ],
+    "oracle": {
+      "violation": false,
+      "rule_id": "checkout.minimum_total",
+      "expected": 45000,
+      "observed": null
+    },
+    "runtime": {
+      "mode": "openshell",
+      "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+      "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+    },
+    "error_code": null
+  },
+  "legitimate": [
+    {
+      "case_id": "full-price",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": 50000,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "a86160f6-815e-454d-978d-33399a2b6cdf",
+          "side_effect": "simulated_order",
+          "status": "accepted",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": 50000
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    },
+    {
+      "case_id": "authorized-promotion",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": 45000,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "7d2ab368-f920-4590-8336-6046fccb89dc",
+          "side_effect": "simulated_order",
+          "status": "accepted",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": 45000
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    }
+  ],
+  "regression": [
+    {
+      "case_id": "client-price-1",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": null,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "df88d53d-de4b-40c1-afef-862fe3fd529a",
+          "side_effect": "simulated_order",
+          "status": "denied",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": null
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    },
+    {
+      "case_id": "client-price-44999",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": null,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "c6c4b4b6-7f1c-40a5-89c5-a713c0fb9cb3",
+          "side_effect": "simulated_order",
+          "status": "denied",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": null
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    },
+    {
+      "case_id": "client-price-45000",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": null,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "e4ed57bf-7761-4f09-9c3f-34f515b17ecf",
+          "side_effect": "simulated_order",
+          "status": "denied",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": null
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    },
+    {
+      "case_id": "client-price-50000",
+      "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+      "model": "fixture/checkout-json-v1",
+      "tool_receipts": [
+        {
+          "charged_total_cents": null,
+          "minimum_allowed_total_cents": 45000,
+          "policy_version": "patch-4d691a37ffef6af09e195a53016bd9dac20c9cf6b485876eccd8ca21ef723411",
+          "product_id": "laptop",
+          "quantity": 1,
+          "receipt_id": "b86a689f-00b1-4038-b0b2-bd8ef0dbbe7c",
+          "side_effect": "simulated_order",
+          "status": "denied",
+          "tool": "checkout",
+          "trusted_catalog_total_cents": 50000
+        }
+      ],
+      "oracle": {
+        "violation": false,
+        "rule_id": "checkout.minimum_total",
+        "expected": 45000,
+        "observed": null
+      },
+      "runtime": {
+        "mode": "openshell",
+        "sandbox_id": "6fd690fe-bdc1-46ed-8861-4263e9a47eea",
+        "policy_digest": "b25e498d46e13530f3026d89d71162ca5895af14b0d2a4defbf091a584e73a66"
+      },
+      "error_code": null
+    }
+  ],
+  "ledger_head": "1be30fb56d7a908a06b8e32e60cc6b82225c6ff6a6c88dac4492ee4dd6e49ae3",
+  "limitations": [
+    "Not held-out evaluation",
+    "No live model or reviewer was called",
+    "Does not establish project-level repair_verified"
+  ]
+}
