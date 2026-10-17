@@ -22,6 +22,48 @@ describe("event integrity", () => {
     const run = fixtureRun();
     expect(applyEvent(run, fixtureEvents[4])).toBe(run);
   });
+  it("normalizes API nested checkout receipts into UI evidence", () => {
+    const started = applyEvent(emptyRun("api-run"), {
+      ...fixtureEvents[0],
+      run_id: "api-run",
+      seq: 1,
+      type: "run.started",
+      data: { mode: "live" },
+    });
+    const event = {
+      ...fixtureEvents[4],
+      run_id: "api-run",
+      seq: 2,
+      task_id: "root",
+      type: "tool.observed",
+      data: { receipt: { receipt_id: "r-api", tool: "checkout", status: "denied" } },
+    };
+    const next = applyEvent(started, event);
+    expect(next.evidence[0]).toMatchObject({ receipt_id: "r-api", tool: "checkout" });
+    expect(next.tasks[0].evidence_ids).toContain("r-api");
+  });
+  it("hydrates the root placeholder from the API task.created event", () => {
+    const started = applyEvent(emptyRun("api-run"), {
+      ...fixtureEvents[0],
+      run_id: "api-run",
+      seq: 1,
+      task_id: "root",
+      type: "run.started",
+      data: { mode: "live" },
+    });
+    const created = applyEvent(started, {
+      ...fixtureEvents[1],
+      run_id: "api-run",
+      seq: 2,
+      task_id: "root",
+      parent_id: null,
+      type: "task.created",
+      data: { role: "investigator", goal: "Explore the target", spawn_reason: "User request", depth: 0,
+        evidence_ids: [], child_ids: [] },
+    });
+    expect(created.tasks).toHaveLength(1);
+    expect(created.tasks[0].goal).toBe("Explore the target");
+  });
   it("rejects cross-run data and missing sequences", () => {
     const run = emptyRun("fixture-run-1");
     expect(() => applyEvent(run, fixtureEvents[1])).toThrow(

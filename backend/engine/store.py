@@ -66,8 +66,10 @@ class RunStore:
             self.db.execute("BEGIN IMMEDIATE")
             try:
                 seq = self.db.execute("SELECT COALESCE(MAX(seq),0)+1 FROM events WHERE run_id=?", (run.run_id,)).fetchone()[0]
+                event_data = dict(data or {})
+                event_data.setdefault("counters", run.usage.model_dump(mode="json"))
                 event = Event(run_id=run.run_id, seq=seq, type=kind, task_id=task_id,
-                              parent_id=parent_id, data=data or {})
+                              parent_id=parent_id, data=event_data)
                 run.last_seq = seq
                 run.updated_at = now()
                 self.db.execute("INSERT INTO events VALUES(?,?,?)", (run.run_id, seq, event.model_dump_json()))

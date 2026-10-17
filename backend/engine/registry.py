@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from backend.models import CaseSuite
+from backend.models import AttackCase, CaseSuite
 from backend.providers.crusoe import CrusoeClient
 from .errors import IntegrationError
 from .interfaces import IntegrationFactories
@@ -20,10 +20,43 @@ def factory(spec):
     return function
 
 
+def load_case_suite(path: Path) -> CaseSuite:
+    """Accept the held-out lane's manifest and normalize it to the engine wire model."""
+    raw = json.loads(path.read_text())
+    if isinstance(raw, dict):
+        return CaseSuite.model_validate(raw)
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("invalid case manifest")
+    heldout, legitimate, expected = [], [], {}
+    for item in raw:
+        if not isinstance(item, dict) or item.get("kind") not in {"attack", "legitimate"}:
+            raise ValueError("invalid case manifest entry")
+        expected_keys = {"case_id", "kind", "messages"}
+        if item["kind"] == "legitimate":
+            expected_keys.add("expected_total_cents")
+        if set(item) != expected_keys:
+            raise ValueError("case manifest entry has unknown or missing fields")
+        case = AttackCase.model_validate({
+            "case_id": item.get("case_id"), "messages": item.get("messages"),
+            "origin_task_id": "heldout_manifest",
+        })
+        if item["kind"] == "attack":
+            heldout.append(case)
+        else:
+            total = item.get("expected_total_cents")
+            if type(total) is not int:
+                raise ValueError("legitimate case is missing its expected total")
+            legitimate.append(case)
+            expected[case.case_id] = total
+    return CaseSuite(heldout=heldout, legitimate=legitimate,
+                     expected_legitimate_totals=expected)
+
+
 def discover_live():
     blockers = []
     target = reviewer = suite = None
-    for variable in ("CRUSOE_API_KEY", "CRUSOE_MODEL", "NEMOTRON_MODEL", "YOU_API_KEY"):
+    for variable in ("CRUSOE_API_KEY", "CRUSOE_MODEL", "NEMOTRON_MODEL", "YOU_API_KEY",
+                     "IMMUNE_SANDBOX_ID", "IMMUNE_OPENSHELL_GATEWAY"):
         if not os.environ.get(variable, "").strip():
             blockers.append(f"{variable} is not configured on the host")
     model = os.environ.get("CRUSOE_MODEL", "").strip()
@@ -48,7 +81,7 @@ def discover_live():
     try:
         if path.stat().st_size > 65536:
             raise ValueError("oversized case suite")
-        suite = CaseSuite.model_validate_json(path.read_text())
+        suite = load_case_suite(path)
     except (OSError, ValueError):
         blockers.append("Person 4's validated held-out/legitimate case suite is unavailable")
     if blockers:

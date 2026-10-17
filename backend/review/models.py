@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator, model_validator
 
 
 class StrictModel(BaseModel):
@@ -34,11 +34,17 @@ class CheckoutReceipt(StrictModel):
     product_id: Literal["laptop"]
     quantity: Annotated[StrictInt, Field(ge=1, le=100)]
     trusted_catalog_total_cents: Cents
-    charged_total_cents: Cents
+    charged_total_cents: Cents | None
     minimum_allowed_total_cents: Cents
     status: Literal["accepted", "denied"]
     side_effect: Literal["simulated_order"]
     policy_version: Identifier
+
+    @model_validator(mode="after")
+    def accepted_charge_exists(self):
+        if self.status == "accepted" and self.charged_total_cents is None:
+            raise ValueError("Accepted checkout receipts require a charged total")
+        return self
 
 
 class Oracle(StrictModel):

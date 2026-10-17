@@ -45,32 +45,41 @@ class TargetExecutor:
         case = deepcopy(case)
         validate_case(case)
         policy = self.registry.get(policy_version)
-        if not isinstance(run_context, dict) or run_context.get("mode") not in ("fixture", "live"):
+        engine_context = hasattr(run_context, "tool_call") and hasattr(run_context, "complete")
+        mode = run_context.run.request.mode if engine_context else (
+            run_context.get("mode") if isinstance(run_context, dict) else None)
+        if mode not in ("fixture", "live"):
             raise TargetError("explicit_execution_mode_required")
-        model = FIXTURE_MODEL if run_context["mode"] == "fixture" else None
+        model = FIXTURE_MODEL if mode == "fixture" else None
         receipts = []
         # Runtime stays unknown until an operation has actually executed.
         provenance = {"mode": "local_fixture", "sandbox_id": None, "policy_digest": policy.digest}
         error = None
         try:
-            check = run_context.get("check_active")
-            reserve = run_context.get("reserve_tool_call")
-            if not callable(check) or not callable(reserve):
+            check = run_context.budget.guard if engine_context else run_context.get("check_active")
+            reserve = None if engine_context else run_context.get("reserve_tool_call")
+            if not callable(check) or (not engine_context and not callable(reserve)):
                 raise TargetError("missing_budget_callbacks")
             await _check_active(check)
-            if run_context["mode"] == "fixture":
+            if mode == "fixture":
                 arguments = fixture_decision(case["messages"])
             else:
-                complete = run_context.get("target_complete")
-                if not callable(complete):
+                complete = None if engine_context else run_context.get("target_complete")
+                if not engine_context and not callable(complete):
                     raise TargetError("missing_target_provider")
                 # Transport is injected by Person 1 and must reserve model budget itself.
                 try:
-                    response = await _resolve(complete(role="target", messages=[
+                    messages = [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         # Original roles remain data, never attacker-granted system priority.
                         {"role": "user", "content": json.dumps(case["messages"], ensure_ascii=False)},
-                    ], run_context=run_context))
+                    ]
+                    if engine_context:
+                        from backend.models import Message
+                        reply = await run_context.complete("attacker", [Message(**message) for message in messages])
+                        response = {"text": reply.text, "model": reply.model}
+                    else:
+                        response = await _resolve(complete(role="target", messages=messages, run_context=run_context))
                 except TargetError:
                     raise
                 except asyncio.TimeoutError:
@@ -83,11 +92,19 @@ class TargetExecutor:
                 arguments = parse_decision(response.get("text"))
             await _check_active(check)
             if arguments is not None:
-                reservation = await _resolve(reserve())
-                if reservation is False:
-                    raise TargetError("tool_budget_exhausted")
-                await _check_active(check)
-                receipt, provenance = await self.runtime.execute(arguments, policy)
+                if engine_context:
+                    async def checkout():
+                        nonlocal provenance
+                        receipt, provenance = await self.runtime.execute(arguments, policy)
+                        return receipt
+                    receipt = await run_context.tool_call("checkout", checkout, case_id=case["case_id"])
+                    receipt = receipt.model_dump(mode="json")
+                else:
+                    reservation = await _resolve(reserve())
+                    if reservation is False:
+                        raise TargetError("tool_budget_exhausted")
+                    await _check_active(check)
+                    receipt, provenance = await self.runtime.execute(arguments, policy)
                 receipts.append(receipt)
             oracle = evaluate(receipts)
         except TargetError as exc:

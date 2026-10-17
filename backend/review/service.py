@@ -14,7 +14,7 @@ from .errors import ErrorCode, LaneError
 from .evidence import inspect_result, policy_input
 from .models import (ModelReview, Patch, ResearchResult, ReviewOutput,
                      as_data)
-from .prompts import PATCH_SYSTEM, REVIEW_SYSTEM
+from .prompts import PATCH_SYSTEM, REPAIR_REVIEW_SYSTEM, REVIEW_SYSTEM
 
 
 def _unique_object(pairs):
@@ -122,6 +122,49 @@ Malformed model responses/citations raise LaneError. Missing or contradictory
                       reason=("Deterministic violation remains proven; independent review is unresolved: "
                               + decision.reason)[:4000])
     elif decision.status != "supported":
+        output["proposed_child_goals"] = []
+    return ReviewOutput.model_validate(output).model_dump()
+
+
+async def review_repair(result, policy, research, run_context: ReviewContext) -> dict:
+    """Independently verify a protected replay after a patch was applied."""
+    trusted_policy = policy_input(policy)
+    try:
+        attack, violation_ids = inspect_result(result, trusted_policy)
+    except LaneError as exc:
+        if exc.code == ErrorCode.INVALID_INPUT:
+            raise
+        return ReviewOutput(status="inconclusive", reason=exc.code.value,
+                            evidence_ids=[], proposed_child_goals=[]).model_dump()
+    if violation_ids or not attack.tool_receipts:
+        return ReviewOutput(status="inconclusive",
+                            reason="The replay does not provide clean checkout evidence.",
+                            evidence_ids=[], proposed_child_goals=[]).model_dump()
+    try:
+        sources = ResearchResult.model_validate(as_data(research))
+    except ValidationError:
+        raise LaneError(ErrorCode.INVALID_INPUT) from None
+    if sources.mode != run_context.mode or sources.error_code or not sources.sources:
+        return ReviewOutput(status="inconclusive", reason="Research is unavailable or unresolved.",
+                            evidence_ids=[], proposed_child_goals=[]).model_dump()
+    receipt_ids = {receipt.receipt_id for receipt in attack.tool_receipts}
+    source_ids = {source.source_id for source in sources.sources}
+    if receipt_ids & source_ids:
+        raise LaneError(ErrorCode.INVALID_EVIDENCE)
+    decision = await _completion(ModelReview, "reviewer", REPAIR_REVIEW_SYSTEM, {
+        "trusted_policy": trusted_policy.model_dump(),
+        "repaired_replay": attack.model_dump(),
+        "research_untrusted": sources.model_dump(),
+        "allowed_evidence_ids": sorted(receipt_ids | source_ids),
+    }, run_context)
+    if (not set(decision.evidence_ids) <= receipt_ids | source_ids
+            or not set(decision.evidence_ids) & receipt_ids):
+        raise LaneError(ErrorCode.INVALID_EVIDENCE)
+    output = decision.model_dump(exclude={"uncertainty"})
+    if decision.uncertainty or decision.status != "supported":
+        output.update(status="inconclusive", proposed_child_goals=[],
+                      reason=("Unresolved replay review: " + decision.reason)[:4000])
+    else:
         output["proposed_child_goals"] = []
     return ReviewOutput.model_validate(output).model_dump()
 

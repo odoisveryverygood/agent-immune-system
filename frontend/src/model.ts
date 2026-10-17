@@ -101,18 +101,40 @@ export function applyEvent(run: Run, event: RunEvent): Run {
       });
   }
   if (event.type === "task.created") {
-    if (next.tasks.some((t) => t.task_id === event.task_id))
-      throw Error("Task ID was reused in a new event.");
-    const parent = next.tasks.find((t) => t.task_id === event.parent_id);
-    if (
-      !parent ||
-      event.task_id === event.parent_id ||
-      Number(d.depth) !== parent.depth + 1
-    )
-      throw Error(
-        "Invalid task lineage: parent or depth does not match the persisted tree.",
-      );
-    if (!next.tasks.some((t) => t.task_id === event.task_id))
+    const existing = next.tasks.find((t) => t.task_id === event.task_id);
+    if (event.parent_id === null) {
+      if (
+        Number(d.depth) !== 0 ||
+        next.tasks.some((t) => t.parent_id === null && t.task_id !== event.task_id) ||
+        (existing && existing.parent_id !== null)
+      )
+        throw Error("Invalid task lineage: root task does not match the run.");
+      const root: Task = {
+        task_id: event.task_id,
+        parent_id: null,
+        role: String(d.role || "investigator"),
+        goal: String(d.goal || ""),
+        spawn_reason: String(d.spawn_reason || "No spawn reason supplied"),
+        depth: Number(d.depth || 0),
+        status: existing?.status || "queued",
+        evidence_ids: Array.isArray(d.evidence_ids)
+          ? d.evidence_ids.map(String)
+          : [],
+        child_ids: existing?.child_ids || [],
+      };
+      if (existing) Object.assign(existing, root);
+      else next.tasks.push(root);
+    } else {
+      const parent = next.tasks.find((t) => t.task_id === event.parent_id);
+      if (
+        existing ||
+        !parent ||
+        event.task_id === event.parent_id ||
+        Number(d.depth) !== parent.depth + 1
+      )
+        throw Error(
+          "Invalid task lineage: parent or depth does not match the persisted tree.",
+        );
       next.tasks.push({
         task_id: event.task_id,
         parent_id: event.parent_id,
@@ -126,26 +148,37 @@ export function applyEvent(run: Run, event: RunEvent): Run {
           : [],
         child_ids: [],
       });
-    if (parent && !parent.child_ids.includes(event.task_id))
-      parent.child_ids.push(event.task_id);
+      if (!parent.child_ids.includes(event.task_id))
+        parent.child_ids.push(event.task_id);
+    }
   }
   const task = next.tasks.find((t) => t.task_id === event.task_id);
   if (task && /^task\.(started|completed|failed)$/.test(event.type))
     task.status =
       event.type === "task.started" ? "running" : event.type.slice(5);
   if (event.type === "tool.observed" || event.type === "violation.found") {
+    const receipt =
+      event.type === "tool.observed" &&
+      d.receipt &&
+      typeof d.receipt === "object" &&
+      !Array.isArray(d.receipt)
+        ? (d.receipt as Data)
+        : d;
     next.evidence.push({
-      ...d,
+      ...receipt,
+      ...(typeof d.case_id === "string" && typeof receipt.case_id !== "string"
+        ? { case_id: d.case_id }
+        : {}),
       task_id: event.task_id,
       event_seq: event.seq,
       event_type: event.type,
     });
     if (
       task &&
-      typeof d.receipt_id === "string" &&
-      !task.evidence_ids.includes(d.receipt_id)
+      typeof receipt.receipt_id === "string" &&
+      !task.evidence_ids.includes(receipt.receipt_id)
     )
-      task.evidence_ids.push(d.receipt_id);
+      task.evidence_ids.push(receipt.receipt_id);
   }
   if (d.counters && typeof d.counters === "object")
     next.counters = { ...next.counters, ...(d.counters as Data) };

@@ -96,7 +96,39 @@ def create_app(*, store_path=None, live_factories=None, fixtures=None, max_runs=
 
     @app.get("/api/runs/{run_id}")
     async def snapshot(run_id: str):
-        return get_run(run_id)
+        run = get_run(run_id)
+        events = app.state.service.store.events(run.run_id, after=0, limit=512)
+        result_by_receipt = {
+            receipt.receipt_id: result.case_id
+            for result in run.results
+            for receipt in result.tool_receipts
+        }
+        evidence = []
+        for event in events:
+            if event.type == "tool.observed":
+                receipt = event.data.get("receipt")
+                if isinstance(receipt, dict):
+                    evidence.append({**receipt, "case_id": result_by_receipt.get(receipt.get("receipt_id")),
+                                     "task_id": event.task_id, "event_seq": event.seq,
+                                     "event_type": event.type})
+            elif event.type == "violation.found":
+                evidence.append({**event.data, "task_id": event.task_id,
+                                 "event_seq": event.seq, "event_type": event.type})
+        last_result = run.results[-1] if run.results else None
+        return {
+            "run_id": run.run_id,
+            "status": run.status,
+            "mode": run.request.mode,
+            "tasks": [task.model_dump(mode="json") for task in run.tasks],
+            "events": [event.model_dump(mode="json") for event in events],
+            "counters": run.usage.model_dump(mode="json"),
+            "evidence": evidence,
+            "patch": run.patch.model_dump(mode="json") if run.patch else None,
+            "evaluation": run.evaluation.model_dump(mode="json"),
+            "repair_verified": run.repair_verified,
+            "last_seq": run.last_seq,
+            "runtime": last_result.runtime.model_dump(mode="json") if last_result else None,
+        }
 
     @app.post("/api/runs/{run_id}/cancel", status_code=202)
     async def cancel(run_id: str):
@@ -106,8 +138,13 @@ def create_app(*, store_path=None, live_factories=None, fixtures=None, max_runs=
 
     @app.get("/api/runs/{run_id}/events")
     async def events(run_id: str, request: Request, after: int | None = Query(default=None, ge=0),
+                     after_seq: int | None = Query(default=None, ge=0),
                      last_event_id: str | None = Header(default=None)):
         run = get_run(run_id)
+        if after is not None and after_seq is not None and after != after_seq:
+            raise HTTPException(400, "Use one event cursor value.")
+        if after is None:
+            after = after_seq
         if after is None:
             try:
                 after = int(last_event_id) if last_event_id else 0

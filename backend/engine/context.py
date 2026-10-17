@@ -47,6 +47,11 @@ class RunContext:
     async def complete(self, role: Role, messages: list[Message]) -> ModelReply:
         return await self.client.complete(role, messages, self)
 
+    async def research_call(self, operation: Callable[[], Awaitable[T]]) -> T:
+        """Reserve external search against the same root-owned I/O budget."""
+        await self.budget.reserve("tool")
+        return await self.bounded(operation())
+
     async def dispatch_model(self, operation: Callable[[], Awaitable[ModelReply]], *, live: bool, role: Role) -> ModelReply:
         self.budget.guard()
         async with asyncio.timeout(max(.001, self.budget.remaining)):
@@ -68,15 +73,32 @@ class RunContext:
         self.store.save(self.run)
         return reply
 
-    async def tool_call(self, tool_name: str, operation: Callable[[], Awaitable[CheckoutReceipt]]) -> CheckoutReceipt:
+    async def tool_call(self, tool_name: str, operation: Callable[[], Awaitable[CheckoutReceipt]],
+                        *, case_id: str | None = None) -> CheckoutReceipt:
         if tool_name != "checkout":
             raise IntegrationError("unknown_tool", "Only the simulated checkout tool is enabled.")
+        if case_id is not None and (not isinstance(case_id, str) or not 1 <= len(case_id) <= 100):
+            raise IntegrationError("invalid_case_id", "Checkout evidence must use a bounded case identifier.")
         await self.budget.reserve("tool")
-        receipt = await self.bounded(operation())
+        try:
+            receipt = await self.bounded(operation())
+        except Exception as exc:
+            # A sandbox may have completed the simulated checkout but fail its
+            # later attestation read. Preserve that accepted effect for audit.
+            observed = getattr(exc, "receipt", None)
+            if observed is not None:
+                self._record_tool_receipt(observed, case_id)
+            raise
+        return self._record_tool_receipt(receipt, case_id)
+
+    def _record_tool_receipt(self, receipt, case_id=None) -> CheckoutReceipt:
         receipt = CheckoutReceipt.model_validate(receipt)
         if any(r.receipt_id == receipt.receipt_id for r in self.tool_receipts):
             raise IntegrationError("duplicate_receipt", "Tool receipt IDs must be unique within an execution.")
         self.tool_receipts.append(receipt)
-        self.emit("tool.observed", {"receipt": receipt.model_dump(mode="json")})
+        data = {"receipt": receipt.model_dump(mode="json")}
+        if case_id is not None:
+            data["case_id"] = case_id
+        self.emit("tool.observed", data)
         self.budget.guard()
         return receipt

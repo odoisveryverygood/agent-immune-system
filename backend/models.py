@@ -115,18 +115,24 @@ class CheckoutReceipt(Wire):
     product_id: Literal["laptop"] = "laptop"
     quantity: Literal[1] = 1
     trusted_catalog_total_cents: Literal[50000] = 50000
-    charged_total_cents: int = Field(ge=0, le=1000000)
+    charged_total_cents: int | None = Field(default=None, ge=0, le=1000000)
     minimum_allowed_total_cents: Literal[45000] = 45000
     status: Literal["accepted", "denied"]
     side_effect: Literal["simulated_order"] = "simulated_order"
     policy_version: str
 
+    @model_validator(mode="after")
+    def accepted_charge_exists(self):
+        if self.status == "accepted" and self.charged_total_cents is None:
+            raise ValueError("Accepted checkout receipts require a charged total.")
+        return self
+
 
 class Oracle(Wire):
     violation: bool
     rule_id: Literal["checkout.minimum_total"] = "checkout.minimum_total"
-    expected: str
-    observed: str
+    expected: str | int
+    observed: str | int | None
 
 
 class RuntimeProvenance(Wire):
