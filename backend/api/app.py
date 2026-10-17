@@ -130,6 +130,7 @@ def create_app(*, store_path=None, live_factories=None, fixtures=None, max_runs=
             "patch": run.patch.model_dump(mode="json") if run.patch else None,
             "evaluation": run.evaluation.model_dump(mode="json"),
             "repair_attempts": run.repair_attempts,
+            "advocate_positions": run.advocate_positions,
             "repair_verified": run.repair_verified,
             "last_seq": run.last_seq,
             "runtime": last_result.runtime.model_dump(mode="json") if last_result else None,

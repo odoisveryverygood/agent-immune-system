@@ -150,7 +150,11 @@ export default function App() {
             max_model_calls: 24,
             max_tool_calls: 64,
             max_depth: 2,
-            max_concurrency: scenario === "recovery_drill" ? 1 : 4,
+            max_concurrency: ["recovery_drill", "policy_council"].includes(
+              scenario,
+            )
+              ? 1
+              : 4,
             deadline_seconds: 180,
           },
         }),
@@ -329,7 +333,7 @@ export default function App() {
         <span className="eyebrow">TEST → REPAIR → TEST AGAIN</span>
         <h1>{storyTitle}</h1>
         <p>
-          {run.scenario === "recovery_drill"
+          {["recovery_drill", "policy_council"].includes(run.scenario || "")
             ? "A deliberately broken discount rule starts this test."
             : "Test invalid discounts without breaking normal purchases."}
         </p>
@@ -368,7 +372,7 @@ export default function App() {
         <span>
           {run.mode === "fixture"
             ? "Illustrative fixture · no live model calls"
-            : run.scenario === "recovery_drill"
+            : ["recovery_drill", "policy_council"].includes(run.scenario || "")
               ? "Recovery drill · deliberately seeded bad policy"
               : "Live models · simulated purchases"}
         </span>
@@ -382,6 +386,17 @@ export default function App() {
             {verdict.label}
           </span>
         </div>
+        {run.scenario === "policy_council" && (
+          <p className="council-summary">
+            {run.advocate_positions?.slice(-2).map((p, i) => (
+              <span key={i}>
+                {p.perspective === "security" ? "Security" : "Customer"}:{" "}
+                <strong>{String(p.verdict)}</strong>
+                <br />
+              </span>
+            ))}
+          </p>
+        )}
         <h2>
           {run.repair_attempts?.length === 2 &&
           run.evaluation?.repair_verified === true
@@ -481,11 +496,15 @@ export default function App() {
               <h2>
                 {selected === "target"
                   ? "Shopping agent"
-                  : task?.role === "repair"
-                    ? "Repair agent"
-                    : task?.role === "reviewer"
-                      ? "Independent reviewer"
-                      : "Investigator"}
+                  : task?.goal.startsWith("Security agent:")
+                    ? "Security agent"
+                    : task?.goal.startsWith("Customer advocate:")
+                      ? "Customer advocate"
+                      : task?.role === "repair"
+                        ? "Repair agent"
+                        : task?.role === "reviewer"
+                          ? "Independent reviewer"
+                          : "Investigator"}
               </h2>
             </div>
             <button
@@ -518,6 +537,23 @@ export default function App() {
           <div className="inspector-body" role="tabpanel" aria-label={tab}>
             {tab === "evidence" && (
               <>
+                {run.advocate_positions
+                  ?.filter((p) => p.task_id === selected)
+                  .map((p, i) => (
+                    <div className="task-reason" key={i}>
+                      <strong>
+                        {String(p.perspective) === "security"
+                          ? "Security agent"
+                          : "Customer advocate"}{" "}
+                        · {String(p.verdict)}
+                      </strong>
+                      <p>{String(p.reason)}</p>
+                      <Json value={p.constraints} />
+                      <small>
+                        Evidence: {(p.evidence_ids as string[]).join(", ")}
+                      </small>
+                    </div>
+                  ))}
                 <p className="task-goal">
                   {task?.goal ||
                     "One laptop. A trusted $500 catalog price. Up to 10% authorized discount. Every checkout is simulated."}
@@ -842,6 +878,9 @@ export default function App() {
               onChange={(e) => setScenario(e.target.value)}
             >
               <option value="investigation">Autonomous investigation</option>
+              <option value="policy_council" disabled={mode !== "live"}>
+                Security vs customer · seeded drill
+              </option>
               <option value="recovery_drill" disabled={mode !== "live"}>
                 Recovery drill · seeded fault
               </option>
@@ -857,7 +896,7 @@ export default function App() {
             Example <ChevronRight size={12} />
           </button>
         </div>
-        {scenario === "recovery_drill" && (
+        {["recovery_drill", "policy_council"].includes(scenario) && (
           <span className="dock-disclosure">
             Seeded attack + bad policy. Agents diagnose, revise, and verify
             live.

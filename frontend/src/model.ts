@@ -31,6 +31,7 @@ export interface Run {
   patch?: Data;
   evaluation?: Data;
   repair_attempts?: Data[];
+  advocate_positions?: Data[];
   scenario?: string;
   target?: string;
   last_seq: number;
@@ -202,6 +203,8 @@ export function applyEvent(run: Run, event: RunEvent): Run {
     };
   if (event.type === "run.started" && typeof d.scenario === "string")
     next.scenario = d.scenario;
+  if (event.type === "advocate.reviewed")
+    next.advocate_positions = [...(run.advocate_positions || []), d];
   if (event.type === "repair.checked")
     next.repair_attempts = [...(next.repair_attempts || []), d];
   if (event.type === "evaluation.completed") next.evaluation = d;

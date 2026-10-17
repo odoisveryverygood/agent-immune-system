@@ -19,15 +19,19 @@ export interface InvestigationCanvasProps {
   onSelect: (id: string) => void;
 }
 const roleName = (t: Task) =>
-  t.role === "repair"
-    ? "Repair agent"
-    : t.role === "reviewer"
-      ? "Independent reviewer"
-      : t.role === "attacker"
-        ? "Attack investigator"
-        : t.depth > 0
-          ? "Child investigator"
-          : "Lead investigator";
+  t.goal.startsWith("Security agent:")
+    ? "Security agent"
+    : t.goal.startsWith("Customer advocate:")
+      ? "Customer advocate"
+      : t.role === "repair"
+        ? "Repair agent"
+        : t.role === "reviewer"
+          ? "Independent reviewer"
+          : t.role === "attacker"
+            ? "Attack investigator"
+            : t.depth > 0
+              ? "Child investigator"
+              : "Lead investigator";
 export default function InvestigationCanvas({
   run,
   selected,
@@ -202,8 +206,12 @@ export default function InvestigationCanvas({
                 : attempt?.status === "passed_public_checks"
                   ? "Public checks passed"
                   : undefined;
-            const finding =
-              t.status === "failed"
+            const position = run.advocate_positions?.find(
+              (p) => p.task_id === t.task_id,
+            );
+            const finding = position
+              ? `${position.perspective === "security" ? "Security" : "Customer"}: ${position.verdict === "accept" ? "accepts fix" : "challenges fix"}`
+              : t.status === "failed"
                 ? "Task could not finish"
                 : attempt?.status === "rejected"
                   ? Number(attempt.legitimate_accepted) <
