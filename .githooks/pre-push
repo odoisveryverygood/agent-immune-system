@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      printf '%s
+' 'BLOCKED: never push directly to main/master. Push a feature branch and open a pull request.' >&2
+      exit 1
+      ;;
+  esac
+done
+exit 0
