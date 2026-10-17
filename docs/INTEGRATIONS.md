@@ -15,13 +15,15 @@ Copy `.env.example` to an ignored `.env.local`. Each teammate uses their own loc
 
 - `CRUSOE_API_KEY`: host only.
 - `CRUSOE_MODEL`: choose an available model from the account's current catalog.
-- `NEMOTRON_MODEL`: supported Nemotron ID from that same catalog. Previously used elsewhere: `nvidia/NVIDIA-Nemotron-3-Super-120B-A12B`; availability must be checked for this app/account.
+- `NEMOTRON_MODEL`: supported Nemotron ID from that same catalog, distinct from `CRUSOE_MODEL` so the review uses a separate model. The available model catalog can change; select an ID the account currently returns.
 - `YOU_API_KEY`: host only. Person 3 verifies current official request/auth schema.
 - `OPENSHELL_BIN`, `OPENSHELL_GATEWAY`, `OPENSHELL_SANDBOX`: actual installed runtime and target environment; Person 2 documents tested commands. Do not invent a working setup.
 
 ## Official starting points
 
 - [Crusoe hackathon resources](https://github.com/crusoecloud/crusoe-developer-hub/tree/main/examples/hackathons/crusoe-cv-recursive-agents-hackathon)
+- [Crusoe Serverless Inference quickstart](https://docs.cloud.crusoe.ai/quickstart/getting-started-with-serverless-inference/index.html)
+- [Crusoe model catalog and supported parameters](https://support.crusoecloud.com/hc/en-us/articles/55002524169499-How-To-List-Model-Features-via-curl-and-the-Inference-API)
 - [NemoClaw](https://www.nvidia.com/en-us/ai/nemoclaw)
 - [Nemotron](https://developer.nvidia.com/topics/ai/nemotron)
 - [You.com platform](https://you.com/platform)
