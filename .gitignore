@@ -5,7 +5,7 @@
 *.pem
 *.key
 # Local runtime and dependencies
-.venv/
+.venv*/
 __pycache__/
 *.pyc
 node_modules/

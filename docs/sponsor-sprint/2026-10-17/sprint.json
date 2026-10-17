@@ -17,9 +17,12 @@
           "check_id": "CRUSOE-C001",
           "required": true,
           "mode": "live",
-          "status": "not_run",
+          "status": "passed",
           "expected": "A live model completion returns validated JSON and a sanitized provider/model receipt through the root-budgeted completion interface.",
-          "observed": "Not run. The full live workflow depends on Person 2's target and Person 3's review/research integrations; the supplied credential was not written to files or invoked from the shell."
+          "observed": "Crusoe model catalog returned HTTP 200; one completion through RunContext returned the expected JSON and a sanitized live receipt with root counters model_calls=1 and provider_calls=1. This is a provider-boundary check, not an end-to-end run.",
+          "checked_at": "2026-10-17T20:59:32Z",
+          "evidence_path": "crusoe-live-check.txt",
+          "evidence_sha256": "166a35c802d7067aab6f3951c1f4799dc50b89bd2003470f7adfbe4ab146f3b8"
         },
         {
           "check_id": "CRUSOE-C002",
@@ -30,7 +33,15 @@
           "observed": "python3 -m compileall -q backend and git diff --check exited 0.",
           "checked_at": "2026-10-17T20:53:56Z",
           "evidence_path": "compile-check.txt",
-          "evidence_sha256": "9f41a9189d22a9bf6057a04fe990c9cd45fb6dee33dc8b0a9175b93ea253f761"
+          "evidence_sha256": "43733c85bf65339c75112d36cc1807229c8f717a0e6ece0ed8d327e90804ba12"
+        },
+        {
+          "check_id": "CRUSOE-C003",
+          "required": true,
+          "mode": "live",
+          "status": "not_run",
+          "expected": "A reviewer-role completion uses the configured distinct Nemotron model through the shared budgeted interface.",
+          "observed": "The authenticated catalog listed a distinct Nemotron model, but no reviewer-role completion was sent. The full reviewer flow remains pending Person 3's integration."
         }
       ]
     }

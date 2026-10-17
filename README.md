@@ -61,7 +61,7 @@ See [INTEGRATIONS.md](docs/INTEGRATIONS.md) for owners, configuration and verifi
 ## Run the backend
 
 ```sh
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r backend/requirements.txt
 sh scripts/setup.sh
