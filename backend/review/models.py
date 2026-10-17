@@ -55,9 +55,9 @@ class Oracle(StrictModel):
 
 
 class Runtime(StrictModel):
-    mode: Literal["openshell", "local_fixture"]
-    sandbox_id: Identifier
-    policy_digest: Identifier
+    mode: Literal["openshell", "local_fixture", "not_executed"]
+    sandbox_id: Identifier | None
+    policy_digest: Identifier | None
 
 
 class AttackResult(StrictModel):

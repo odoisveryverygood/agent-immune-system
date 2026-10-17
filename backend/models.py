@@ -136,7 +136,7 @@ class Oracle(Wire):
 
 
 class RuntimeProvenance(Wire):
-    mode: Literal["openshell", "local_fixture"]
+    mode: Literal["openshell", "local_fixture", "not_executed"]
     sandbox_id: str | None = None
     policy_digest: str | None = None
 
